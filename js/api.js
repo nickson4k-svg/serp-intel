@@ -13,23 +13,23 @@ export function getBaseUrlCandidates() {
 
   const candidates = [];
   if (typeof window !== 'undefined' && window.location) {
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const port = window.location.port;
+    const hostname = window.location.hostname;
+    const port     = window.location.port;
 
-    if (port === '3000') {
-      // Running via local proxy server — proxy handles CORS + routes /api.php to root
+    if (port === '3001') {
+      // Running directly via our proxy server on 3001
       candidates.push(`${window.location.origin}/api.php`);
-    } else if (isLocal) {
-      // Running on VS Code Live Server or other non-3000 local port
-      // The background proxy server listens on port 3000
-      candidates.push('http://localhost:3000/api.php');
-      candidates.push('http://127.0.0.1:3000/api.php');
+    } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // Running via Antigravity IDE / VS Code / other local server.
+      // Our CORS-proxy runs on localhost:3001 to avoid collision with IDE on :3000.
+      candidates.push('http://localhost:3001/api.php');
     }
+    // GitHub Pages / any other host: no local proxy available, go direct below
   }
 
-  // Direct FreeSerp API endpoints (confirmed 200 JSON via server-side probe)
-  // NOTE: Browser fetch hits CORS duplicate header bug; proxy at /api.php on localhost:3000 solves this.
-  // These are fallback attempts if no local proxy is found.
+  // Direct FreeSerp API endpoints.
+  // NOTE: Browser fetch will be CORS-blocked (duplicate "*, *" header from freeserp.ai).
+  // The catch in rawApiQuery silently falls back to snapshot data in that case.
   candidates.push('https://freeserp.ai/api.php');
   candidates.push('https://freeserp.ai/api');
 
@@ -184,6 +184,11 @@ async function executeWithCandidateFallback(urlBuilder) {
       }
     } catch (err) {
       lastError = err;
+      // CORS errors are systemic — all remaining direct candidates will fail too.
+      // Short-circuit immediately so we don't spam 3 identical CORS errors in the console.
+      if (err.isCors) {
+        break;
+      }
       continue;
     }
   }
@@ -273,8 +278,12 @@ export async function rawApiQuery(params = {}, options = {}) {
   const queryParams = new URLSearchParams();
   queryParams.set('agent', AGENT);
   queryParams.set('project', PROJECT);
+  // index=sites is REQUIRED by freeserp.ai — without it the server returns 404
+  queryParams.set('index', params.index || 'sites');
 
   for (const [key, val] of Object.entries(params)) {
+    // skip 'index' — already set above
+    if (key === 'index') continue;
     if (val !== undefined && val !== null && val !== '') {
       queryParams.set(key, String(val));
     }
