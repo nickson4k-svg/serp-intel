@@ -14,18 +14,16 @@ export function getBaseUrlCandidates() {
   const candidates = [];
   if (typeof window !== 'undefined' && window.location) {
     const hostname = window.location.hostname;
-    const port     = window.location.port;
+    const origin   = window.location.origin;
 
-    if (port === '4000') {
-      // Running directly via our proxy server on 4000
-      candidates.push(`${window.location.origin}/api.php`);
-    } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      // Running via Antigravity IDE / VS Code / other local server.
-      // Our CORS-proxy runs on localhost:4000 to avoid collision with IDE ports.
+    // 1. Same-origin proxy (works for Vercel /api.php and local proxy on 4000)
+    candidates.push(`${origin}/api.php`);
+
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // If frontend runs on a different port (e.g. IDE live server), connect to local proxy on 4000
       candidates.push('http://localhost:4000/api.php');
       candidates.push('http://127.0.0.1:4000/api.php');
     }
-    // GitHub Pages / any other host: no local proxy available, go direct below
   }
 
   // Direct FreeSerp API endpoints.
