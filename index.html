@@ -338,8 +338,8 @@
         <svg class="svg-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
           <defs>
             <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#a1a1aa" stop-opacity="0.08"/>
-              <stop offset="100%" stop-color="#a1a1aa" stop-opacity="0.0"/>
+              <stop offset="0%" stop-color="#10b981" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"/>
             </linearGradient>
           </defs>
 
@@ -406,11 +406,11 @@
             <td>
               <span>${idx + 1}. ${escapeHtml(cat.key)}</span>
             </td>
-            <td style="text-align: right; font-weight: 500; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-primary);">
+            <td class="text-right font-mono tabular-nums" style="text-align: right; font-weight: 500; color: var(--text-primary);">
               ${formatNumber(cat.count)}
             </td>
             <td>
-              <div style="font-size: 10px; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-muted); margin-bottom: 2px;">${percent}%</div>
+              <div class="font-mono tabular-nums" style="font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">${percent}%</div>
               <div class="progress-bar-bg" style="height: 4px;">
                 <div class="progress-bar-fill" style="width: ${percent}%; background: #a1a1aa;"></div>
               </div>
@@ -434,7 +434,7 @@
             <td>
               <span style="font-family: var(--font-mono); font-size: 12.5px;">${escapeHtml(s.key)}</span>
             </td>
-            <td style="text-align: right; font-weight: 500; font-family: var(--font-mono); font-variant-numeric: tabular-nums;">
+            <td class="text-right font-mono tabular-nums" style="text-align: right; font-weight: 500;">
               ${formatNumber(s.count)}
             </td>
             <td style="text-align: right;">

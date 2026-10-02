@@ -24,26 +24,31 @@
 
     <!-- Search Form -->
     <div class="search-bar-wrap">
-      <form class="search-form" id="searchForm" onsubmit="event.preventDefault(); runTeardown();">
-        <input 
-          type="text" 
-          id="domainInput" 
-          class="form-control search-input" 
-          placeholder="Введіть домен (наприклад, bolt.new, explodingtopics.com, base44.com)"
-          value="bolt.new"
-          required
-        >
-        <button type="submit" class="btn btn-primary" id="searchBtn">
-          Аналіз домену
-        </button>
+      <form class="search-form-compact" id="searchForm" onsubmit="event.preventDefault(); runTeardown();">
+        <div class="input-with-button">
+          <input 
+            type="text" 
+            id="domainInput" 
+            class="compact-input font-mono" 
+            placeholder="Введіть домен (наприклад, bolt.new, convertri.com, base44.com)"
+            value="bolt.new"
+            autocomplete="off"
+            spellcheck="false"
+            required
+          >
+          <button type="submit" class="compact-submit-btn" id="searchBtn" title="Аналіз домену (Enter)">
+            <span id="searchBtnText">Аналіз</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
       </form>
       <div class="quick-chips">
         <span>Швидкий вибір:</span>
-        <span class="chip" onclick="selectQuick('bolt.new')">bolt.new</span>
-        <span class="chip" onclick="selectQuick('explodingtopics.com')">explodingtopics.com</span>
-        <span class="chip" onclick="selectQuick('base44.com')">base44.com</span>
-        <span class="chip" onclick="selectQuick('expireddomains.com')">expireddomains.com</span>
-        <span class="chip" onclick="selectQuick('convertri.com')">convertri.com</span>
+        <button type="button" class="chip" onclick="selectQuick('bolt.new')">bolt.new</button>
+        <button type="button" class="chip" onclick="selectQuick('convertri.com')">convertri.com</button>
+        <button type="button" class="chip" onclick="selectQuick('explodingtopics.com')">explodingtopics.com</button>
+        <button type="button" class="chip" onclick="selectQuick('base44.com')">base44.com</button>
+        <button type="button" class="chip" onclick="selectQuick('expireddomains.com')">expireddomains.com</button>
       </div>
     </div>
 
@@ -211,9 +216,16 @@
         .replace(/\/.*$/, '')
         .trim();
 
+      const searchBtn = document.getElementById('searchBtn');
+      const searchBtnText = document.getElementById('searchBtnText');
       const loadingBox = document.getElementById('loadingBox');
       const notFoundBox = document.getElementById('notFoundBox');
       const auditBox = document.getElementById('auditContentBox');
+
+      if (searchBtn) searchBtn.disabled = true;
+      if (searchBtnText) {
+        searchBtnText.innerHTML = '<span class="btn-spinner"></span>';
+      }
 
       loadingBox.style.display = 'block';
       notFoundBox.style.display = 'none';
@@ -319,6 +331,9 @@
         loadingBox.style.display = 'none';
         notFoundBox.style.display = 'block';
         document.getElementById('notFoundDomainName').textContent = domain;
+      } finally {
+        if (searchBtn) searchBtn.disabled = false;
+        if (searchBtnText) searchBtnText.textContent = 'Аналіз';
       }
     };
 
@@ -334,6 +349,12 @@
     document.getElementById('searchForm')?.addEventListener('submit', (e) => {
       e.preventDefault();
       runTeardown();
+    });
+    document.getElementById('domainInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        runTeardown();
+      }
     });
     document.getElementById('searchBtn')?.addEventListener('click', (e) => {
       e.preventDefault();

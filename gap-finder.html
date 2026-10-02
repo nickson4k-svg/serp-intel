@@ -103,9 +103,9 @@
             <thead>
               <tr>
                 <th style="width: 30%;">Домен / Проєкт</th>
-                <th style="width: 12%; text-align: right;">DR</th>
+                <th class="text-right" style="width: 12%; text-align: right;">DR</th>
                 <th style="width: 18%;">Стек (ai_source)</th>
-                <th style="width: 20%; text-align: right;">Вперше live</th>
+                <th class="text-right" style="width: 20%; text-align: right;">Вперше live</th>
                 <th style="width: 20%;">Категорії</th>
               </tr>
             </thead>
@@ -205,7 +205,7 @@
                 ${escapeHtml(s.title || 'Без заголовка')}
               </div>
             </td>
-            <td style="text-align: right;">
+            <td class="text-right font-mono tabular-nums" style="text-align: right;">
               <span class="metric-badge ${s.dr === 0 ? 'badge-rose' : 'badge-emerald'} font-mono tabular-nums">
                 DR ${s.dr ?? 0}
               </span>
@@ -213,7 +213,7 @@
             <td>
               <code style="font-size: 12px;">${escapeHtml(s.ai_source || 'not_ai')}</code>
             </td>
-            <td style="text-align: right; font-size: 12px;">
+            <td class="text-right font-mono tabular-nums" style="text-align: right; font-size: 12px;">
               <span class="font-mono tabular-nums">${escapeHtml(s.went_live || '—')}</span>
             </td>
             <td style="font-size: 11.5px; color: var(--text-muted);">
