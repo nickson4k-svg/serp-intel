@@ -291,6 +291,11 @@ a:hover {
   color: var(--text-secondary); /* text-zinc-400 */
   max-width: 720px;
   line-height: 1.5;
+  text-decoration: none !important;
+}
+
+.page-hero-subtitle * {
+  text-decoration: none !important;
 }
 
 /* Status Chips & Badges — Minimalist & Subtle */
