@@ -62,22 +62,16 @@ export function renderHeader(activePage = 'pulse') {
 
   header.innerHTML = `
     <div class="container header-inner">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <a href="index.html" class="brand">
-          <div class="brand-radar">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path>
-              <path d="M8.5 8.5a5 5 0 0 0 7 7"></path>
-              <circle cx="12" cy="12" r="1.5" fill="currentColor"></circle>
-            </svg>
-          </div>
-          <span>VibeRadar</span>
-        </a>
-        <span class="header-status-indicator" id="headerApiStatus" title="Підключено до живого FreeSerp API">
-          <span class="status-dot dot-live" id="headerApiDot"></span>
-          <span id="headerApiText">Live</span>
-        </span>
-      </div>
+      <a href="index.html" class="brand">
+        <div class="brand-radar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path>
+            <path d="M8.5 8.5a5 5 0 0 0 7 7"></path>
+            <circle cx="12" cy="12" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <span>VibeRadar</span>
+      </a>
 
       <nav aria-label="Головна навігація">
         <ul class="nav-links">
@@ -98,31 +92,6 @@ export function renderHeader(activePage = 'pulse') {
   `;
 
   document.getElementById('themeToggleBtn')?.addEventListener('click', toggleTheme);
-}
-
-// 2.1 Live / Cached Status Updater
-export function updateApiStatus(isLive, label) {
-  const dot = document.getElementById('headerApiDot');
-  const text = document.getElementById('headerApiText');
-  const container = document.getElementById('headerApiStatus');
-  if (!dot || !text) return;
-  if (isLive) {
-    dot.className = 'status-dot dot-live';
-    text.textContent = label || 'Live';
-    if (container) container.title = 'Підключено до живого FreeSerp API';
-  } else {
-    dot.className = 'status-dot dot-cached';
-    text.textContent = label || 'Cached';
-    if (container) container.title = 'Офлайн / Резервний знімок даних';
-  }
-}
-
-if (typeof window !== 'undefined') {
-  window.addEventListener('viberadar:api-status', (e) => {
-    if (e.detail) {
-      updateApiStatus(e.detail.isLive, e.detail.label);
-    }
-  });
 }
 
 // 3. Footer renderer

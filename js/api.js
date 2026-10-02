@@ -307,17 +307,11 @@ export async function rawApiQuery(params = {}, options = {}) {
 
     if (data && data.ok) {
       safeSetCache(cacheKey, data);
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('viberadar:api-status', { detail: { isLive: true, label: 'Live' } }));
-      }
     }
 
     return { ...data, _cached: false, _sourceUrl: targetUrl };
   } catch (err) {
     console.warn('[VibeRadar API] Мережевий запит недоступний, використовуємо знімок даних:', err.message);
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('viberadar:api-status', { detail: { isLive: false, label: 'Cached' } }));
-    }
     const fallbackData = await resolveFallbackData(params);
     return { ...fallbackData, _cached: false, _fallback: true, _sourceUrl: 'snapshot-fallback' };
   }

@@ -293,44 +293,7 @@ a:hover {
   line-height: 1.5;
 }
 
-/* Header API Status Indicator (Single Truth Source in Top Header) */
-.header-status-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  color: var(--text-secondary);
-  padding: 1px 7px;
-  border-radius: var(--radius-full);
-  background: rgba(39, 39, 42, 0.5);
-  border: 1px solid var(--border-subtle);
-  margin-left: 6px;
-  vertical-align: middle;
-}
-
-[data-theme="light"] .header-status-indicator {
-  background: #f1f5f9;
-  border-color: #e2e8f0;
-  color: #52525b;
-}
-
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.status-dot.dot-live {
-  background: var(--color-success);
-}
-
-.status-dot.dot-cached {
-  background: var(--color-warning);
-}
+/* Status Chips & Badges — Minimalist & Subtle */
 
 .metric-badge {
   font-size: 11px;
