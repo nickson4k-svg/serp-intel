@@ -4,16 +4,46 @@
  * 10s Timeout and 502 Retry Mechanism.
  */
 
-function resolveBaseUrl() {
+let activeBaseUrl = null;
+
+export function getBaseUrlCandidates() {
+  if (activeBaseUrl) return [activeBaseUrl];
+
+  const candidates = [];
   if (typeof window !== 'undefined' && window.location) {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return `${window.location.origin}/api.php`;
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const port = window.location.port;
+
+    if (port === '3000') {
+      candidates.push(`${window.location.origin}/api.php`);
+      candidates.push(`${window.location.origin}/api`);
+    } else if (isLocal) {
+      // Running on VS Code Live Server (port 5500) or other local dev port
+      // The background proxy server server.js listens on port 3000
+      candidates.push('http://localhost:3000/api.php');
+      candidates.push('http://127.0.0.1:3000/api.php');
+      candidates.push('http://localhost:3000/api');
+      if (window.location.origin && window.location.origin !== 'null') {
+        candidates.push(`${window.location.origin}/api.php`);
+      }
+    } else if (window.location.protocol === 'file:') {
+      candidates.push('http://localhost:3000/api.php');
+      candidates.push('http://127.0.0.1:3000/api.php');
     }
   }
-  return 'https://freeserp.ai/api.php';
+
+  // Direct FreeSerp API endpoints
+  candidates.push('https://freeserp.ai/api.php');
+  candidates.push('https://freeserp.ai/api');
+
+  return candidates;
 }
 
-const BASE_URL = resolveBaseUrl();
+export function getActiveBaseUrl() {
+  return activeBaseUrl || getBaseUrlCandidates()[0];
+}
+
+let BASE_URL = getActiveBaseUrl();
 const AGENT = 'VibeRadar/1.0';
 const PROJECT = 'VibeRadar';
 const MIN_REQUEST_INTERVAL_MS = 350; // Max ~2.8 requests/sec (< 3 req/sec)
@@ -131,36 +161,79 @@ async function fetchWithRetry(url, attempt = 0) {
 }
 
 /**
+ * Executes a query with candidate base URL fallback to avoid 404s
+ */
+async function executeWithCandidateFallback(urlBuilder) {
+  const candidates = getBaseUrlCandidates();
+  let lastError = null;
+
+  for (let i = 0; i < candidates.length; i++) {
+    const base = candidates[i];
+    const targetUrl = urlBuilder(base);
+
+    try {
+      const data = await fetchWithRetry(targetUrl);
+      if (data && (data.ok || data.results || data.stats || data.total !== undefined || data.generated_at)) {
+        activeBaseUrl = base;
+        BASE_URL = base;
+        return { data, targetUrl };
+      }
+    } catch (err) {
+      lastError = err;
+      // If error is 404 (e.g. Live Server without api.php) or connection failure or CORS, try next candidate
+      if (err.status === 404 || err.isCors || (err.name === 'TypeError' && err.message.toLowerCase().includes('failed to fetch'))) {
+        console.warn(`[VibeRadar API] Endpoint ${base} повернув ${err.message || 'помилку'}, спроба наступного джерела...`);
+        continue;
+      }
+      continue;
+    }
+  }
+
+  if (lastError && (lastError.isCors || lastError.status === 404)) {
+    const friendlyErr = new Error(
+      `Не вдалося з'єднатися з API FreeSerp (HTTP 404 / CORS). Якщо ви відкрили проєкт через VS Code Live Server (порт 5500), запустіть у терміналі 'node server.js' та перейдіть на http://localhost:3000`
+    );
+    friendlyErr.original = lastError;
+    friendlyErr.status = lastError.status;
+    throw friendlyErr;
+  }
+
+  throw lastError || new Error('Не вдалося підключитися до API FreeSerp.');
+}
+
+/**
  * Core query function with caching and queueing
  */
 export async function rawApiQuery(params = {}, options = {}) {
-  const urlObj = new URL(BASE_URL);
-  
-  // Enforce mandatory parameters
-  urlObj.searchParams.set('agent', AGENT);
-  urlObj.searchParams.set('project', PROJECT);
+  const queryParams = new URLSearchParams();
+  queryParams.set('agent', AGENT);
+  queryParams.set('project', PROJECT);
 
   for (const [key, val] of Object.entries(params)) {
     if (val !== undefined && val !== null && val !== '') {
-      urlObj.searchParams.set(key, String(val));
+      queryParams.set(key, String(val));
     }
   }
 
-  const cacheKey = urlObj.toString();
+  const queryStr = queryParams.toString();
+  const cacheKey = `query:${queryStr}`;
+
   if (!options.bypassCache) {
     const cached = safeGetCache(cacheKey);
     if (cached) {
-      return { ...cached, _cached: true, _sourceUrl: cacheKey };
+      return { ...cached, _cached: true, _sourceUrl: `${getActiveBaseUrl()}?${queryStr}` };
     }
   }
 
-  const result = await apiQueue.enqueue(() => fetchWithRetry(cacheKey));
-  
-  if (result && result.ok) {
-    safeSetCache(cacheKey, result);
+  const { data, targetUrl } = await apiQueue.enqueue(() => 
+    executeWithCandidateFallback(base => `${base}?${queryStr}`)
+  );
+
+  if (data && data.ok) {
+    safeSetCache(cacheKey, data);
   }
 
-  return { ...result, _cached: false, _sourceUrl: cacheKey };
+  return { ...data, _cached: false, _sourceUrl: targetUrl };
 }
 
 /**

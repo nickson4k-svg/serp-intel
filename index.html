@@ -271,7 +271,7 @@
       } catch (err) {
         console.error('Pulse load error:', err);
         errBox.style.display = 'flex';
-        errMsg.textContent = err.message || 'Не вдалося підключитися до API FreeSerp.';
+        errMsg.innerHTML = err.message || 'Не вдалося підключитися до API FreeSerp.';
       }
     }
 
