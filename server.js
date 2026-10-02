@@ -16,7 +16,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 4000;
 const BASE_DIR = __dirname;
 
 const MIME_TYPES = {

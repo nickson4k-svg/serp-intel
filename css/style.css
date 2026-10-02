@@ -293,32 +293,43 @@ a:hover {
   line-height: 1.5;
 }
 
-/* Status Chips & Badges — Minimalist & Subtle */
-.live-indicator {
+/* Header API Status Indicator (Single Truth Source in Top Header) */
+.header-status-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   font-size: 11px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-weight: 500;
-  padding: 2px 8px;
+  color: var(--text-secondary);
+  padding: 1px 7px;
   border-radius: var(--radius-full);
-  background: #27272a;
-  color: #d4d4d8;
-  border: 1px solid rgba(63, 63, 70, 0.5);
+  background: rgba(39, 39, 42, 0.5);
+  border: 1px solid var(--border-subtle);
+  margin-left: 6px;
+  vertical-align: middle;
 }
 
-[data-theme="light"] .live-indicator {
+[data-theme="light"] .header-status-indicator {
   background: #f1f5f9;
-  color: #334155;
-  border-color: #cbd5e1;
+  border-color: #e2e8f0;
+  color: #52525b;
 }
 
-.live-dot {
+.status-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--color-success);
   display: inline-block;
+}
+
+.status-dot.dot-live {
+  background: var(--color-success);
+}
+
+.status-dot.dot-cached {
+  background: var(--color-warning);
 }
 
 .metric-badge {

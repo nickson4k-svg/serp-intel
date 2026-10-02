@@ -16,10 +16,6 @@
     <section class="page-hero">
       <div class="page-hero-title">
         <h1>Pulse: Моніторинг активності вебсайтів</h1>
-        <span class="live-indicator" id="liveStatusBadge">
-          <span class="live-dot"></span>
-          Живі дані індексу
-        </span>
       </div>
       <p class="page-hero-subtitle">
         Моніторинг щоденної появи сайтів, активності AI-продуктів та розподілу категорій у глобальному індексі
@@ -208,16 +204,6 @@
           const badge = document.getElementById('generatedAtBadge');
           if (badge) {
             badge.textContent = `Оновлено: ${formatDate(stats.generated_at)}`;
-          }
-        }
-
-        if (stats._fallback) {
-          const liveBadge = document.getElementById('liveStatusBadge');
-          if (liveBadge) {
-            liveBadge.innerHTML = `<span class="live-dot" style="background: #94a3b8; box-shadow: none;"></span>Знімок даних (офлайн)`;
-            liveBadge.style.borderColor = 'rgba(148, 163, 184, 0.3)';
-            liveBadge.style.color = '#94a3b8';
-            liveBadge.style.background = 'rgba(148, 163, 184, 0.1)';
           }
         }
 

@@ -16,13 +16,14 @@ export function getBaseUrlCandidates() {
     const hostname = window.location.hostname;
     const port     = window.location.port;
 
-    if (port === '3001') {
-      // Running directly via our proxy server on 3001
+    if (port === '4000') {
+      // Running directly via our proxy server on 4000
       candidates.push(`${window.location.origin}/api.php`);
     } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
       // Running via Antigravity IDE / VS Code / other local server.
-      // Our CORS-proxy runs on localhost:3001 to avoid collision with IDE on :3000.
-      candidates.push('http://localhost:3001/api.php');
+      // Our CORS-proxy runs on localhost:4000 to avoid collision with IDE ports.
+      candidates.push('http://localhost:4000/api.php');
+      candidates.push('http://127.0.0.1:4000/api.php');
     }
     // GitHub Pages / any other host: no local proxy available, go direct below
   }
@@ -306,11 +307,17 @@ export async function rawApiQuery(params = {}, options = {}) {
 
     if (data && data.ok) {
       safeSetCache(cacheKey, data);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('viberadar:api-status', { detail: { isLive: true, label: 'Live' } }));
+      }
     }
 
     return { ...data, _cached: false, _sourceUrl: targetUrl };
   } catch (err) {
     console.warn('[VibeRadar API] Мережевий запит недоступний, використовуємо знімок даних:', err.message);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('viberadar:api-status', { detail: { isLive: false, label: 'Cached' } }));
+    }
     const fallbackData = await resolveFallbackData(params);
     return { ...fallbackData, _cached: false, _fallback: true, _sourceUrl: 'snapshot-fallback' };
   }
