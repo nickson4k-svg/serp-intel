@@ -4,7 +4,16 @@
  * 10s Timeout and 502 Retry Mechanism.
  */
 
-const BASE_URL = 'https://freeserp.ai/api.php';
+function resolveBaseUrl() {
+  if (typeof window !== 'undefined' && window.location) {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return `${window.location.origin}/api.php`;
+    }
+  }
+  return 'https://freeserp.ai/api.php';
+}
+
+const BASE_URL = resolveBaseUrl();
 const AGENT = 'VibeRadar/1.0';
 const PROJECT = 'VibeRadar';
 const MIN_REQUEST_INTERVAL_MS = 350; // Max ~2.8 requests/sec (< 3 req/sec)
@@ -109,6 +118,14 @@ async function fetchWithRetry(url, attempt = 0) {
       timeoutErr.isTimeout = true;
       throw timeoutErr;
     }
+    if (err.name === 'TypeError' && err.message.toLowerCase().includes('failed to fetch')) {
+      const corsErr = new Error(
+        `Браузер заблокував запит (CORS / file://). Сервер freeserp.ai надсилає дубльований заголовок 'Access-Control-Allow-Origin: *, *'. Запустіть у терміналі 'node server.js' та відкрийте http://localhost:3000`
+      );
+      corsErr.isCors = true;
+      corsErr.original = err;
+      throw corsErr;
+    }
     throw err;
   }
 }
@@ -204,6 +221,8 @@ export async function searchSites(filters = {}, options = {}) {
     _sourceUrl: response._sourceUrl
   };
 }
+
+export { BASE_URL, AGENT, PROJECT };
 
 // Global window exposure for non-module script tags
 if (typeof window !== 'undefined') {
