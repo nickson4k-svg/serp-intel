@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulse — VibeRadar | Пульс екосистеми вебсайтів та AI-стартапів</title>
+  <meta name="description" content="Живий пульс появи нових вебсайтів, активність AI-стартапів та динаміка ніш за даними FreeSerp.ai.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Global Header Navigation -->
+  <header class="site-header" role="banner"></header>
+
+  <main class="container" role="main">
+    <!-- Hero / Title -->
+    <section class="page-hero">
+      <div class="page-hero-title">
+        <h1>Pulse: Пульс індексу</h1>
+        <span class="live-indicator">
+          <span class="live-dot"></span>
+          Живі дані індексу
+        </span>
+      </div>
+      <p class="page-hero-subtitle">
+        Моніторинг щоденної появи сайтів, активності AI-продуктів та розподілу категорій у глобальному індексі
+        <a href="https://freeserp.ai" target="_blank" rel="noopener">FreeSerp Main</a> (20M+ сайтів).
+      </p>
+    </section>
+
+    <!-- Error container -->
+    <div id="errorAlert" class="alert alert-danger" style="display: none;" role="alert">
+      <span>⚠️ Помилка завантаження даних із API: <strong id="errorMessage"></strong></span>
+    </div>
+
+    <!-- Section 1: Key Metrics Grid -->
+    <section class="section" aria-labelledby="metrics-heading">
+      <div class="section-header">
+        <h2 id="metrics-heading" class="section-title">
+          <span>📊 Загальна динаміка та AI-стартапи</span>
+        </h2>
+        <span id="generatedAtBadge" class="source-tag">
+          поле: <code>stats.generated_at</code>
+        </span>
+      </div>
+
+      <div class="metrics-grid">
+        <!-- New today -->
+        <article class="metric-card accent-card">
+          <div class="metric-card-header">
+            <span class="metric-label">Нові сайти сьогодні</span>
+            <span class="metric-badge">Сьогодні</span>
+          </div>
+          <div class="metric-value" id="valNewToday">
+            <span class="skeleton" style="width: 110px; height: 32px;"></span>
+          </div>
+          <div class="source-tag">поле: <code>stats.new.today</code></div>
+        </article>
+
+        <!-- New yesterday -->
+        <article class="metric-card">
+          <div class="metric-card-header">
+            <span class="metric-label">Нові вчора</span>
+            <span class="metric-badge">Вчора</span>
+          </div>
+          <div class="metric-value" id="valNewYesterday">
+            <span class="skeleton" style="width: 100px; height: 32px;"></span>
+          </div>
+          <div class="source-tag">поле: <code>stats.new.yesterday</code></div>
+        </article>
+
+        <!-- New 7 days -->
+        <article class="metric-card">
+          <div class="metric-card-header">
+            <span class="metric-label">Нові за 7 днів</span>
+            <span class="metric-badge">7 днів</span>
+          </div>
+          <div class="metric-value" id="valNew7d">
+            <span class="skeleton" style="width: 115px; height: 32px;"></span>
+          </div>
+          <div class="source-tag">поле: <code>stats.new.last_7d</code></div>
+        </article>
+
+        <!-- New 30 days -->
+        <article class="metric-card">
+          <div class="metric-card-header">
+            <span class="metric-label">Нові за 30 днів</span>
+            <span class="metric-badge">30 днів</span>
+          </div>
+          <div class="metric-value" id="valNew30d">
+            <span class="skeleton" style="width: 125px; height: 32px;"></span>
+          </div>
+          <div class="source-tag">поле: <code>stats.new.last_30d</code></div>
+        </article>
+
+        <!-- AI Startups Total -->
+        <article class="metric-card accent-card">
+          <div class="metric-card-header">
+            <span class="metric-label">AI-стартапи (всього)</span>
+            <span class="metric-badge" style="background: rgba(168, 85, 247, 0.2); color: var(--color-purple);">AI Products</span>
+          </div>
+          <div class="metric-value" id="valAiStartupsTotal">
+            <span class="skeleton" style="width: 105px; height: 32px;"></span>
+          </div>
+          <div class="source-tag">поле: <code>stats.ai_startups.total</code></div>
+        </article>
+
+        <!-- AI Startups Today -->
+        <article class="metric-card">
+          <div class="metric-card-header">
+            <span class="metric-label">AI-стартапи сьогодні</span>
+            <span class="metric-badge">Сьогодні</span>
+          </div>
+          <div class="metric-value" id="valAiStartupsToday">
+            <span class="skeleton" style="width: 60px; height: 32px;"></span>
+          </div>
+          <div class="source-tag">поле: <code>stats.ai_startups.today</code></div>
+        </article>
+
+        <!-- Real sites in index -->
+        <article class="metric-card">
+          <div class="metric-card-header">
+            <span class="metric-label">Всіх реальних сайтів</span>
+            <span class="metric-badge">Total</span>
+          </div>
+          <div class="metric-value" id="valRealSites">
+            <span class="skeleton" style="width: 130px; height: 32px;"></span>
+          </div>
+          <div class="source-tag">поле: <code>stats.totals.real_sites</code></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Section 2: SVG Chart (by_day) -->
+    <section class="section" aria-labelledby="chart-heading">
+      <div class="section-header">
+        <h2 id="chart-heading" class="section-title">
+          <span>📈 Динаміка появи нових сайтів за 30 днів (SVG)</span>
+        </h2>
+        <div class="source-tag">поле: <code>stats.by_day[]</code> (вперше зафіксовано живим)</div>
+      </div>
+
+      <div class="card">
+        <div id="chartContainer" class="chart-container" style="min-height: 250px;">
+          <div class="chart-tooltip" id="chartTooltip"></div>
+          <div id="chartPlaceholder" style="padding: 40px; text-align: center; color: var(--text-muted);">
+            Завантаження графіка тренду...
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Two Columns: Top AI Categories & Tech Stacks -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; margin-bottom: 28px;">
+      <!-- Top AI Niches -->
+      <section class="section" aria-labelledby="niches-heading">
+        <div class="section-header">
+          <h2 id="niches-heading" class="section-title">
+            <span>🎯 Топ-ніші AI-стартапів</span>
+          </h2>
+          <div class="source-tag">поле: <code>stats.top_ai_categories[]</code></div>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="data-table" id="nichesTable">
+              <thead>
+                <tr>
+                  <th style="width: 45%;">Ніша / Категорія</th>
+                  <th style="width: 25%; text-align: right;">Сайтів</th>
+                  <th style="width: 30%;">Частка від лідера</th>
+                </tr>
+              </thead>
+              <tbody id="nichesTableBody">
+                <tr><td colspan="3" style="text-align: center; padding: 24px; color: var(--text-muted);">Завантаження списку ніш...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Top AI Stacks & DR -->
+      <section class="section" aria-labelledby="stack-heading">
+        <div class="section-header">
+          <h2 id="stack-heading" class="section-title">
+            <span>⚙️ Технологічні стеки та сигнали білдерів</span>
+          </h2>
+          <div class="source-tag">поле: <code>stats.top_ai_source[]</code></div>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="data-table" id="stackTable">
+              <thead>
+                <tr>
+                  <th>Стек / Сигнал</th>
+                  <th style="text-align: right;">Сайтів</th>
+                  <th>Тип</th>
+                </tr>
+              </thead>
+              <tbody id="stackTableBody">
+                <tr><td colspan="3" style="text-align: center; padding: 24px; color: var(--text-muted);">Завантаження стеків...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="site-footer" role="contentinfo"></footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { getStats } from './js/api.js';
+    import { renderHeader, renderFooter, formatNumber, formatShortDate, formatDate } from './js/ui.js';
+
+    // Initialize layout
+    renderHeader('pulse');
+    renderFooter();
+
+    async function loadPulseData() {
+      const errBox = document.getElementById('errorAlert');
+      const errMsg = document.getElementById('errorMessage');
+
+      try {
+        const stats = await getStats();
+
+        // 1. Populate Header info
+        if (stats.generated_at) {
+          const badge = document.getElementById('generatedAtBadge');
+          badge.innerHTML = `Оновлено: <strong>${formatDate(stats.generated_at)}</strong> (<code>stats.generated_at</code>)`;
+        }
+
+        // 2. Populate Metric Cards with precise values & source tags
+        document.getElementById('valNewToday').textContent = formatNumber(stats.new?.today);
+        document.getElementById('valNewYesterday').textContent = formatNumber(stats.new?.yesterday);
+        document.getElementById('valNew7d').textContent = formatNumber(stats.new?.last_7d);
+        document.getElementById('valNew30d').textContent = formatNumber(stats.new?.last_30d);
+        document.getElementById('valAiStartupsTotal').textContent = formatNumber(stats.ai_startups?.total);
+        document.getElementById('valAiStartupsToday').textContent = formatNumber(stats.ai_startups?.today);
+        document.getElementById('valRealSites').textContent = formatNumber(stats.totals?.real_sites);
+
+        // 3. Render SVG Chart for by_day
+        if (Array.isArray(stats.by_day) && stats.by_day.length > 0) {
+          renderSvgChart(stats.by_day);
+        } else {
+          document.getElementById('chartPlaceholder').textContent = 'Дані щоденної динаміки відсутні.';
+        }
+
+        // 4. Render Top AI Niches Table
+        if (Array.isArray(stats.top_ai_categories) && stats.top_ai_categories.length > 0) {
+          renderNichesTable(stats.top_ai_categories);
+        }
+
+        // 5. Render Top AI Stacks Table
+        if (Array.isArray(stats.top_ai_source) && stats.top_ai_source.length > 0) {
+          renderStackTable(stats.top_ai_source);
+        }
+
+      } catch (err) {
+        console.error('Pulse load error:', err);
+        errBox.style.display = 'flex';
+        errMsg.textContent = err.message || 'Не вдалося підключитися до API FreeSerp.';
+      }
+    }
+
+    /**
+     * Pure SVG Bar Chart renderer with responsive viewBox and interactive tooltips
+     */
+    function renderSvgChart(rawDays) {
+      const container = document.getElementById('chartContainer');
+      const tooltip = document.getElementById('chartTooltip');
+      
+      // Sort chronologically (oldest to newest)
+      const days = [...rawDays].reverse();
+      
+      const width = 1000;
+      const height = 240;
+      const padLeft = 60;
+      const padRight = 20;
+      const padTop = 25;
+      const padBottom = 35;
+
+      const chartW = width - padLeft - padRight;
+      const chartH = height - padTop - padBottom;
+
+      const maxVal = Math.max(...days.map(d => d.count), 1);
+      const minVal = 0;
+      const barCount = days.length;
+      const barGap = 6;
+      const barW = (chartW / barCount) - barGap;
+
+      // Calculate Average line
+      const sum = days.reduce((acc, d) => acc + d.count, 0);
+      const avg = Math.round(sum / barCount);
+      const avgY = padTop + chartH - ((avg / maxVal) * chartH);
+
+      let barsSvg = '';
+      let labelsSvg = '';
+
+      days.forEach((item, idx) => {
+        const x = padLeft + idx * (barW + barGap);
+        const barHeight = Math.max(3, (item.count / maxVal) * chartH);
+        const y = padTop + chartH - barHeight;
+        const dateFormatted = formatShortDate(item.key);
+
+        barsSvg += `
+          <rect 
+            class="chart-bar" 
+            x="${x}" 
+            y="${y}" 
+            width="${barW}" 
+            height="${barHeight}" 
+            data-date="${item.key.slice(0, 10)}" 
+            data-count="${item.count}"
+          ></rect>
+        `;
+
+        // Every 3rd date label to avoid overlapping on small screens
+        if (idx % 3 === 0 || idx === barCount - 1) {
+          labelsSvg += `
+            <text class="chart-axis-text" x="${x + barW / 2}" y="${height - 12}" text-anchor="middle">
+              ${dateFormatted}
+            </text>
+          `;
+        }
+      });
+
+      // Horizontal grid lines (3 steps)
+      let gridSvg = '';
+      for (let i = 0; i <= 3; i++) {
+        const gridVal = Math.round((maxVal / 3) * i);
+        const gridY = padTop + chartH - ((gridVal / maxVal) * chartH);
+        gridSvg += `
+          <line class="chart-axis-line" x1="${padLeft}" y1="${gridY}" x2="${width - padRight}" y2="${gridY}"></line>
+          <text class="chart-axis-text" x="${padLeft - 8}" y="${gridY + 3}" text-anchor="end">${formatNumber(gridVal)}</text>
+        `;
+      }
+
+      const svgHtml = `
+        <svg class="svg-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
+          <!-- Background grid -->
+          ${gridSvg}
+
+          <!-- Average dotted line -->
+          <line x1="${padLeft}" y1="${avgY}" x2="${width - padRight}" y2="${avgY}" stroke="#f59e0b" stroke-dasharray="4 4" stroke-width="1.5"></line>
+          <text class="chart-axis-text" x="${width - padRight}" y="${avgY - 6}" fill="#f59e0b" text-anchor="end">Сер: ${formatNumber(avg)}/день</text>
+
+          <!-- Bars -->
+          ${barsSvg}
+
+          <!-- X-Axis line -->
+          <line class="chart-axis-line" x1="${padLeft}" y1="${padTop + chartH}" x2="${width - padRight}" y2="${padTop + chartH}"></line>
+
+          <!-- Labels -->
+          ${labelsSvg}
+        </svg>
+      `;
+
+      container.innerHTML = `<div class="chart-tooltip" id="chartTooltip"></div>` + svgHtml;
+
+      // Event listeners for interactive tooltips
+      const newTooltip = document.getElementById('chartTooltip');
+      container.querySelectorAll('.chart-bar').forEach(bar => {
+        bar.addEventListener('mouseenter', (e) => {
+          const date = bar.getAttribute('data-date');
+          const count = formatNumber(Number(bar.getAttribute('data-count')));
+          newTooltip.innerHTML = `<strong>${date}</strong><br>Вперше зафіксовано: <strong>${count}</strong> сайтів`;
+          newTooltip.classList.add('visible');
+        });
+
+        bar.addEventListener('mousemove', (e) => {
+          const rect = container.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          newTooltip.style.left = `${x}px`;
+          newTooltip.style.top = `${y}px`;
+        });
+
+        bar.addEventListener('mouseleave', () => {
+          newTooltip.classList.remove('visible');
+        });
+      });
+    }
+
+    /**
+     * Render Top AI Niches Table
+     */
+    function renderNichesTable(categories) {
+      const tbody = document.getElementById('nichesTableBody');
+      const maxCount = categories[0]?.count || 1;
+
+      tbody.innerHTML = categories.slice(0, 10).map((cat, idx) => {
+        const percent = ((cat.count / maxCount) * 100).toFixed(0);
+        return `
+          <tr>
+            <td>
+              <strong>${idx + 1}. ${escapeHtml(cat.key)}</strong>
+            </td>
+            <td style="text-align: right; font-weight: 600; font-family: var(--font-mono);">
+              ${formatNumber(cat.count)}
+            </td>
+            <td>
+              <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">${percent}%</div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: ${percent}%;"></div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Render Top AI Tech Stacks Table
+     */
+    function renderStackTable(stacks) {
+      const tbody = document.getElementById('stackTableBody');
+
+      tbody.innerHTML = stacks.slice(0, 10).map((s, idx) => {
+        const isAiBuilder = ['lovable', 'v0', 'bolt', 'base44', 'ai_likely'].includes(s.key.toLowerCase());
+        const badgeColor = isAiBuilder 
+          ? 'background: rgba(56, 189, 248, 0.15); color: var(--text-accent); border: 1px solid rgba(56, 189, 248, 0.3);'
+          : 'background: var(--bg-card-hover); color: var(--text-muted);';
+
+        return `
+          <tr>
+            <td>
+              <code>${escapeHtml(s.key)}</code>
+            </td>
+            <td style="text-align: right; font-weight: 600; font-family: var(--font-mono);">
+              ${formatNumber(s.count)}
+            </td>
+            <td>
+              <span class="metric-badge" style="${badgeColor}">
+                ${isAiBuilder ? 'AI Builder' : 'Classic Stack'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    loadPulseData();
+  </script>
+</body>
+</html>
