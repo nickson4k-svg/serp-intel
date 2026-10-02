@@ -235,12 +235,24 @@ async function resolveFallbackData(params = {}) {
     }
   }
 
+  let filtered = allSites;
+  if (params.q) {
+    const qClean = String(params.q).toLowerCase().replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/.*$/, '').trim();
+    const matched = allSites.filter(s => {
+      const sDom = (s.domain || '').toLowerCase().replace(/^www\./i, '');
+      return sDom === qClean || sDom.includes(qClean) || qClean.includes(sDom);
+    });
+    if (matched.length > 0) {
+      filtered = matched;
+    }
+  }
+
   return {
     ok: true,
-    total: allSites.length,
-    count: allSites.length,
-    took_ms: 15,
-    results: allSites.slice(0, Number(params.size) || 20),
+    total: filtered.length,
+    count: filtered.length,
+    took_ms: 10,
+    results: filtered.slice(0, Number(params.size) || 20),
     filters: params
   };
 }
