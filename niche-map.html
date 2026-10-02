@@ -17,20 +17,9 @@
         <h1>Niche Map: Теплова карта ніш</h1>
       </div>
       <p class="page-hero-subtitle">
-        Матриця проникнення білдерів (Lovable, v0, Bolt, Base44) у профільні підкатегорії. 
-        Кожна клітинка показує точну кількість сайтів (<code>total</code> із <code>size=1</code>). 
-        Клікніть на будь-яку клітинку для перегляду топ-5 сайтів за авторитетністю (DR).
+        Розподіл нових AI-продуктів за категоріями та платформами генерації коду. Клікніть на клітинку для перегляду доменів.
       </p>
     </section>
-
-    <!-- Disclaimer Alert -->
-    <div class="disclaimer-banner" role="note">
-      <span style="font-size: 18px;">ℹ️</span>
-      <div>
-        <strong>Важливе застереження:</strong> Ця матриця показує <u>кількість створених сайтів</u> (валову присутність у індексі), 
-        а <strong>не їхню якість</strong> чи обсяг трафіку. Сайти можуть мати Domain Rating 0 та бути експериментальними прототипами.
-      </div>
-    </div>
 
     <!-- Progress Indicator -->
     <div id="progressWrap" style="margin-bottom: 20px;">
@@ -196,7 +185,7 @@
               cellEl.className = `heatmap-cell ${getHeatClass(count)}`;
               cellEl.textContent = formatNumber(count);
               cellEl.setAttribute('data-count', count);
-              cellEl.title = `${b.name} × ${niche}: ${formatNumber(count)} сайтів\nДжерело: countBy({ ai_source: '${b.id}', ai_categories: '${niche}' })\nКлікніть для перегляду топ-5 за DR`;
+              cellEl.title = `${b.name} × ${niche}: ${formatNumber(count)} сайтів. Клікніть для перегляду топ-5 за DR`;
             }
           } catch (err) {
             console.error(`Error loading cell ${b.id} x ${niche}:`, err);
