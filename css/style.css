@@ -347,66 +347,55 @@ a:hover {
 
 /* ==========================================================================
    Metrics Grid & Metric Cards (Tailwind Slate-900 / 50 + Accents)
+/* ==========================================================================
+   Metrics Grid & Metric Cards (Ahrefs / Semrush B2B Enterprise Styling)
    ========================================================================== */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 1200px) {
+  .metrics-grid {
+    grid-template-columns: repeat(7, 1fr);
+  }
 }
 
 .metric-card {
   background: var(--bg-card);
-  backdrop-filter: var(--backdrop-blur);
-  -webkit-backdrop-filter: var(--backdrop-blur);
   border: 1px solid var(--border-card);
-  border-radius: var(--radius-lg);
-  padding: 20px;
+  border-radius: 8px;
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.metric-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: transparent;
-  transition: background var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
 
 .metric-card:hover {
-  transform: translateY(-2px);
   border-color: var(--border-hover);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.05);
 }
 
-/* Card Accent Top Lines & Badges */
-.card-accent-emerald::before { background: linear-gradient(90deg, #10b981, #34d399); }
-.card-accent-indigo::before  { background: linear-gradient(90deg, #6366f1, #818cf8); }
-.card-accent-violet::before  { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
-.card-accent-sky::before     { background: linear-gradient(90deg, #0284c7, #38bdf8); }
-.card-accent-amber::before   { background: linear-gradient(90deg, #d97706, #fbbf24); }
-.card-accent-rose::before    { background: linear-gradient(90deg, #e11d48, #fb7185); }
-
-.metric-card-header {
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin-bottom: 6px;
+  font-feature-settings: "tnum" 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
 }
 
 .metric-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-secondary);
+  line-height: 1.3;
 }
 
 .metric-badge {
@@ -458,36 +447,9 @@ a:hover {
   border-color: rgba(251, 113, 133, 0.25);
 }
 
-.metric-value {
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  color: var(--text-primary);
-  line-height: 1.1;
-  margin-bottom: 8px;
-  font-feature-settings: "tnum" 1;
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-}
-
+/* Hide technical database field tags completely */
 .source-tag {
-  font-size: 11px;
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: auto;
-}
-
-.source-tag code {
-  color: var(--accent-sky);
-  background: rgba(56, 189, 248, 0.08);
-  padding: 1px 5px;
-  border-radius: 4px;
-  font-size: 10.5px;
-  border: 1px solid rgba(56, 189, 248, 0.15);
+  display: none !important;
 }
 
 /* ==========================================================================
@@ -569,47 +531,34 @@ a:hover {
 
 .chart-area-path {
   fill: url(#chartAreaGradient);
-  opacity: 0.85;
+  opacity: 0.15;
 }
 
 .chart-line-path {
   fill: none;
   stroke: var(--accent-sky);
-  stroke-width: 2.5;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 2px 8px rgba(56, 189, 248, 0.4));
 }
 
 .chart-point {
-  fill: #0284c7;
-  stroke: #ffffff;
-  stroke-width: 2;
+  fill: #0f172a;
+  stroke: var(--accent-sky);
+  stroke-width: 1.5;
   cursor: pointer;
-  transition: r var(--transition-fast), fill var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .chart-point:hover {
-  r: 6;
-  fill: #38bdf8;
-  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.8));
-}
-
-.chart-bar {
-  fill: rgba(56, 189, 248, 0.35);
-  rx: 3;
-  transition: fill var(--transition-fast), height var(--transition-normal);
-  cursor: pointer;
-}
-
-.chart-bar:hover {
+  r: 5;
   fill: var(--accent-sky);
-  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
 }
 
 .chart-axis-line {
-  stroke: rgba(51, 65, 85, 0.4);
+  stroke: var(--border-card);
   stroke-width: 1;
+  stroke-dasharray: 2 4;
 }
 
 .chart-axis-text {

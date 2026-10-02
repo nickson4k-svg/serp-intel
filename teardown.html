@@ -38,7 +38,7 @@
           required
         >
         <button type="submit" class="btn btn-primary" id="searchBtn">
-          🔬 Запустити Teardown
+          Аналіз домену
         </button>
       </form>
       <div class="quick-chips">
@@ -60,7 +60,7 @@
 
       <!-- Not Found Container -->
       <div id="notFoundBox" class="not-found-card" style="display: none;">
-        <h3 style="font-size: 18px; margin-bottom: 8px;">ℹ️ Домен не знайдено в індексі FreeSerp Main</h3>
+        <h3 style="font-size: 18px; margin-bottom: 8px;">Домен не знайдено в індексі FreeSerp Main</h3>
         <p style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 8px;">
           Домен <strong id="notFoundDomainName" style="color: #fff;"></strong> відсутній у базі профілів нещодавно активних сайтів (FreeSerp Main).
         </p>
@@ -85,9 +85,6 @@
               <span>Стек: <code id="valAiSource">—</code></span>
               <span>Сервер: <code id="valWebserver">—</code></span>
             </div>
-            <div class="source-tag" style="margin-top: 8px;">
-              запит: <code>searchSites({ q: domain, all: 1, size: 1 })</code>
-            </div>
           </div>
 
           <div class="audit-score-wrap">
@@ -103,9 +100,8 @@
         <section class="section">
           <div class="section-header">
             <h3 class="section-title">
-              <span>📋 Формалізовані правила SEO-гігієни</span>
+              <span>Правила SEO-гігієни</span>
             </h3>
-            <div class="source-tag">масив: <code>SEO_HYGIENE_RULES[]</code></div>
           </div>
 
           <div class="rules-list" id="rulesList">
@@ -288,7 +284,7 @@
             <div class="rule-top">
               <span class="rule-name">${escapeHtml(r.name)}</span>
               <span class="rule-badge ${r.passed ? 'badge-passed' : 'badge-failed'}">
-                ${r.passed ? '✓ ПРОЙДЕНО' : '✕ НЕ ПРОЙДЕНО'} (+${r.passed ? r.weight : 0} / ${r.weight})
+                ${r.passed ? 'Пройдено' : 'Не пройдено'} (+${r.passed ? r.weight : 0} / ${r.weight})
               </span>
             </div>
             <div class="rule-explain">${escapeHtml(r.explain)}</div>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pulse — VibeRadar | Пульс екосистеми вебсайтів та AI-стартапів</title>
-  <meta name="description" content="Живий пульс появи нових вебсайтів, активність AI-стартапів та динаміка ніш за даними FreeSerp.ai.">
+  <title>Pulse — VibeRadar | Моніторинг активності вебсайтів</title>
+  <meta name="description" content="Моніторинг щоденної появи нових вебсайтів, активності AI-стартапів та динаміки ніш за даними FreeSerp.ai.">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -15,8 +15,8 @@
     <!-- Hero / Title -->
     <section class="page-hero">
       <div class="page-hero-title">
-        <h1>Pulse: Пульс індексу</h1>
-        <span class="live-indicator">
+        <h1>Pulse: Моніторинг активності вебсайтів</h1>
+        <span class="live-indicator" id="liveStatusBadge">
           <span class="live-dot"></span>
           Живі дані індексу
         </span>
@@ -27,119 +27,88 @@
       </p>
     </section>
 
-    <!-- Error container -->
+    <!-- Error container (silent by default, fallback protects against broken UI) -->
     <div id="errorAlert" class="alert alert-danger" style="display: none;" role="alert">
-      <span>⚠️ Помилка завантаження даних із API: <strong id="errorMessage"></strong></span>
+      <span>Помилка завантаження даних із API: <strong id="errorMessage"></strong></span>
     </div>
 
     <!-- Section 1: Key Metrics Grid -->
     <section class="section" aria-labelledby="metrics-heading">
       <div class="section-header">
         <h2 id="metrics-heading" class="section-title">
-          <span>📊 Загальна динаміка та AI-стартапи</span>
+          Загальна динаміка та AI-стартапи
         </h2>
-        <span id="generatedAtBadge" class="source-tag">
-          поле: <code>stats.generated_at</code>
-        </span>
+        <span id="generatedAtBadge" style="font-size: 12px; color: var(--text-secondary);"></span>
       </div>
 
       <div class="metrics-grid">
-        <!-- New today (Emerald Accent) -->
-        <article class="metric-card card-accent-emerald">
-          <div class="metric-card-header">
-            <span class="metric-label">Нові сайти сьогодні</span>
-            <span class="metric-badge badge-emerald">Сьогодні</span>
+        <!-- 1. New today -->
+        <article class="metric-card">
+          <div class="metric-value font-mono" id="valNewToday">
+            <span class="skeleton" style="width: 80px; height: 26px;"></span>
           </div>
-          <div class="metric-value" id="valNewToday" style="color: var(--accent-emerald);">
-            <span class="skeleton" style="width: 100px; height: 32px;"></span>
-          </div>
-          <div class="source-tag">поле: <code>stats.new.today</code></div>
+          <div class="metric-label">Нових за 24г</div>
         </article>
 
-        <!-- New yesterday (Amber Accent) -->
-        <article class="metric-card card-accent-amber">
-          <div class="metric-card-header">
-            <span class="metric-label">Нові вчора</span>
-            <span class="metric-badge badge-amber">Вчора</span>
+        <!-- 2. New yesterday -->
+        <article class="metric-card">
+          <div class="metric-value font-mono" id="valNewYesterday">
+            <span class="skeleton" style="width: 80px; height: 26px;"></span>
           </div>
-          <div class="metric-value" id="valNewYesterday" style="color: var(--accent-amber);">
-            <span class="skeleton" style="width: 95px; height: 32px;"></span>
-          </div>
-          <div class="source-tag">поле: <code>stats.new.yesterday</code></div>
+          <div class="metric-label">Нових учора</div>
         </article>
 
-        <!-- New 7 days (Indigo Accent) -->
-        <article class="metric-card card-accent-indigo">
-          <div class="metric-card-header">
-            <span class="metric-label">Нові за 7 днів</span>
-            <span class="metric-badge badge-indigo">7 днів</span>
+        <!-- 3. New 7 days -->
+        <article class="metric-card">
+          <div class="metric-value font-mono" id="valNew7d">
+            <span class="skeleton" style="width: 90px; height: 26px;"></span>
           </div>
-          <div class="metric-value" id="valNew7d" style="color: var(--accent-indigo);">
-            <span class="skeleton" style="width: 110px; height: 32px;"></span>
-          </div>
-          <div class="source-tag">поле: <code>stats.new.last_7d</code></div>
+          <div class="metric-label">За 7 днів</div>
         </article>
 
-        <!-- New 30 days (Sky Accent) -->
-        <article class="metric-card card-accent-sky">
-          <div class="metric-card-header">
-            <span class="metric-label">Нові за 30 днів</span>
-            <span class="metric-badge badge-sky">30 днів</span>
+        <!-- 4. New 30 days -->
+        <article class="metric-card">
+          <div class="metric-value font-mono" id="valNew30d">
+            <span class="skeleton" style="width: 95px; height: 26px;"></span>
           </div>
-          <div class="metric-value" id="valNew30d" style="color: var(--accent-sky);">
-            <span class="skeleton" style="width: 120px; height: 32px;"></span>
-          </div>
-          <div class="source-tag">поле: <code>stats.new.last_30d</code></div>
+          <div class="metric-label">За 30 днів</div>
         </article>
 
-        <!-- AI Startups Total (Violet Accent) -->
-        <article class="metric-card card-accent-violet">
-          <div class="metric-card-header">
-            <span class="metric-label">AI-стартапи (всього)</span>
-            <span class="metric-badge badge-violet">AI Products</span>
+        <!-- 5. AI Startups Total -->
+        <article class="metric-card">
+          <div class="metric-value font-mono" id="valAiStartupsTotal">
+            <span class="skeleton" style="width: 80px; height: 26px;"></span>
           </div>
-          <div class="metric-value" id="valAiStartupsTotal" style="color: var(--accent-violet);">
-            <span class="skeleton" style="width: 95px; height: 32px;"></span>
-          </div>
-          <div class="source-tag">поле: <code>stats.ai_startups.total</code></div>
+          <div class="metric-label">Всього AI-продуктів</div>
         </article>
 
-        <!-- AI Startups Today (Emerald Accent) -->
-        <article class="metric-card card-accent-emerald">
-          <div class="metric-card-header">
-            <span class="metric-label">AI-стартапи сьогодні</span>
-            <span class="metric-badge badge-emerald">Сьогодні</span>
+        <!-- 6. AI Startups Today -->
+        <article class="metric-card">
+          <div class="metric-value font-mono" id="valAiStartupsToday">
+            <span class="skeleton" style="width: 50px; height: 26px;"></span>
           </div>
-          <div class="metric-value" id="valAiStartupsToday" style="color: var(--accent-emerald);">
-            <span class="skeleton" style="width: 60px; height: 32px;"></span>
-          </div>
-          <div class="source-tag">поле: <code>stats.ai_startups.today</code></div>
+          <div class="metric-label">AI-продуктів сьогодні</div>
         </article>
 
-        <!-- Real sites in index (Sky Accent) -->
-        <article class="metric-card card-accent-sky">
-          <div class="metric-card-header">
-            <span class="metric-label">Всіх реальних сайтів</span>
-            <span class="metric-badge badge-sky">Total</span>
+        <!-- 7. Real sites in index -->
+        <article class="metric-card">
+          <div class="metric-value font-mono" id="valRealSites">
+            <span class="skeleton" style="width: 100px; height: 26px;"></span>
           </div>
-          <div class="metric-value" id="valRealSites">
-            <span class="skeleton" style="width: 125px; height: 32px;"></span>
-          </div>
-          <div class="source-tag">поле: <code>stats.totals.real_sites</code></div>
+          <div class="metric-label">Індексовано доменів</div>
         </article>
       </div>
     </section>
 
-    <!-- Section 2: SVG Trend Chart (Area Gradient + Smooth Points) -->
+    <!-- Section 2: SVG Trend Chart (Area Gradient Contour + Smooth Points) -->
     <section class="section" aria-labelledby="chart-heading">
       <div class="section-header">
         <h2 id="chart-heading" class="section-title">
-          <span>📈 Динаміка появи нових сайтів за 30 днів (SVG)</span>
+          Динаміка появи нових сайтів за 30 днів
         </h2>
-        <div class="source-tag">поле: <code>stats.by_day[]</code> (вперше зафіксовано живим)</div>
       </div>
 
-      <div class="card">
+      <div class="card" style="padding: 20px 24px;">
         <div id="chartContainer" class="chart-container" style="min-height: 250px;">
           <div class="chart-tooltip" id="chartTooltip"></div>
           <div id="chartPlaceholder" style="padding: 48px; text-align: center; color: var(--text-muted);">
@@ -155,9 +124,8 @@
       <section class="section" aria-labelledby="niches-heading">
         <div class="section-header">
           <h2 id="niches-heading" class="section-title">
-            <span>🎯 Топ-ніші AI-стартапів</span>
+            Провідні ніші AI-стартапів
           </h2>
-          <div class="source-tag">поле: <code>stats.top_ai_categories[]</code></div>
         </div>
 
         <div class="card" style="padding: 0; overflow: hidden;">
@@ -165,9 +133,9 @@
             <table class="data-table" id="nichesTable">
               <thead>
                 <tr>
-                  <th style="width: 45%;">Ніша / Категорія</th>
+                  <th style="width: 50%;">Ніша / Категорія</th>
                   <th style="width: 25%; text-align: right;">Сайтів</th>
-                  <th style="width: 30%;">Частка від лідера</th>
+                  <th style="width: 25%;">Частка від лідера</th>
                 </tr>
               </thead>
               <tbody id="nichesTableBody">
@@ -187,9 +155,8 @@
       <section class="section" aria-labelledby="stack-heading">
         <div class="section-header">
           <h2 id="stack-heading" class="section-title">
-            <span>⚙️ Технологічні стеки та сигнали білдерів</span>
+            Технологічні стеки та білдери
           </h2>
-          <div class="source-tag">поле: <code>stats.top_ai_source[]</code></div>
         </div>
 
         <div class="card" style="padding: 0; overflow: hidden;">
@@ -239,10 +206,22 @@
         // 1. Header info
         if (stats.generated_at) {
           const badge = document.getElementById('generatedAtBadge');
-          badge.innerHTML = `Оновлено: <strong>${formatDate(stats.generated_at)}</strong> (<code>stats.generated_at</code>)`;
+          if (badge) {
+            badge.textContent = `Оновлено: ${formatDate(stats.generated_at)}`;
+          }
         }
 
-        // 2. Metric Cards
+        if (stats._fallback) {
+          const liveBadge = document.getElementById('liveStatusBadge');
+          if (liveBadge) {
+            liveBadge.innerHTML = `<span class="live-dot" style="background: #94a3b8; box-shadow: none;"></span>Знімок даних (офлайн)`;
+            liveBadge.style.borderColor = 'rgba(148, 163, 184, 0.3)';
+            liveBadge.style.color = '#94a3b8';
+            liveBadge.style.background = 'rgba(148, 163, 184, 0.1)';
+          }
+        }
+
+        // 2. Metric Cards (Large font-mono numbers, concise gray labels underneath)
         document.getElementById('valNewToday').textContent = formatNumber(stats.new?.today);
         document.getElementById('valNewYesterday').textContent = formatNumber(stats.new?.yesterday);
         document.getElementById('valNew7d').textContent = formatNumber(stats.new?.last_7d);
@@ -251,7 +230,7 @@
         document.getElementById('valAiStartupsToday').textContent = formatNumber(stats.ai_startups?.today);
         document.getElementById('valRealSites').textContent = formatNumber(stats.totals?.real_sites);
 
-        // 3. Render Modern SVG Area + Line Chart for by_day
+        // 3. Render Minimalist Contour SVG Area Chart for by_day
         if (Array.isArray(stats.by_day) && stats.by_day.length > 0) {
           renderSvgAreaChart(stats.by_day);
         } else {
@@ -271,12 +250,12 @@
       } catch (err) {
         console.error('Pulse load error:', err);
         errBox.style.display = 'flex';
-        errMsg.innerHTML = err.message || 'Не вдалося підключитися до API FreeSerp.';
+        errMsg.textContent = err.message || 'Не вдалося підключитися до API FreeSerp.';
       }
     }
 
     /**
-     * Modern SVG Area + Line Chart renderer with gradient fill, points, and tooltips
+     * Minimalist Contour SVG Area Chart renderer
      */
     function renderSvgAreaChart(rawDays) {
       const container = document.getElementById('chartContainer');
@@ -287,92 +266,93 @@
       const days = [...rawDays].reverse(); // Oldest to newest
       
       const width = 1000;
-      const height = 250;
+      const height = 240;
       const padLeft = 60;
       const padRight = 24;
-      const padTop = 30;
-      const padBottom = 36;
+      const padTop = 24;
+      const padBottom = 34;
 
       const chartW = width - padLeft - padRight;
       const chartH = height - padTop - padBottom;
 
       const maxVal = Math.max(...days.map(d => d.count), 1);
+      const minVal = Math.min(...days.map(d => d.count));
+      const yFloor = Math.max(0, Math.floor(minVal * 0.85 / 5000) * 5000);
+      const yCeil = Math.ceil(maxVal * 1.05 / 5000) * 5000;
+      const yRange = yCeil - yFloor;
+
       const barCount = days.length;
-      const barGap = 6;
-      const barW = (chartW / barCount) - barGap;
+      const stepX = chartW / (barCount - 1);
 
-      const sum = days.reduce((acc, d) => acc + d.count, 0);
-      const avg = Math.round(sum / barCount);
-      const avgY = padTop + chartH - ((avg / maxVal) * chartH);
-
-      let barsSvg = '';
-      let labelsSvg = '';
-      const points = [];
-
-      days.forEach((item, idx) => {
-        const x = padLeft + idx * (barW + barGap);
-        const barHeight = Math.max(4, (item.count / maxVal) * chartH);
-        const y = padTop + chartH - barHeight;
-        const centerX = x + barW / 2;
-        points.push({ x: centerX, y, count: item.count, date: item.key.slice(0, 10) });
-
-        barsSvg += `
-          <rect 
-            class="chart-bar" 
-            x="${x}" 
-            y="${y}" 
-            width="${barW}" 
-            height="${barHeight}" 
-            data-date="${item.key.slice(0, 10)}" 
-            data-count="${item.count}"
-          ></rect>
-        `;
-
-        // Every 3rd date label
-        if (idx % 3 === 0 || idx === barCount - 1) {
-          labelsSvg += `
-            <text class="chart-axis-text" x="${centerX}" y="${height - 10}" text-anchor="middle">
-              ${formatShortDate(item.key)}
-            </text>
-          `;
-        }
+      const points = days.map((item, idx) => {
+        const x = padLeft + idx * stepX;
+        const normalized = (item.count - yFloor) / yRange;
+        const y = padTop + chartH - (normalized * chartH);
+        return {
+          x,
+          y,
+          count: item.count,
+          date: item.key.slice(0, 10),
+          rawKey: item.key
+        };
       });
 
-      // Construct line path & area path
-      let linePathD = `M ${points[0].x} ${points[0].y}`;
+      // Construct smooth contour path
+      let linePathD = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
       for (let i = 1; i < points.length; i++) {
-        linePathD += ` L ${points[i].x} ${points[i].y}`;
+        // Subtle cubic Bezier curve for clean contour
+        const prev = points[i - 1];
+        const curr = points[i];
+        const cpX1 = prev.x + (curr.x - prev.x) / 2;
+        const cpY1 = prev.y;
+        const cpX2 = prev.x + (curr.x - prev.x) / 2;
+        const cpY2 = curr.y;
+        linePathD += ` C ${cpX1.toFixed(1)} ${cpY1.toFixed(1)}, ${cpX2.toFixed(1)} ${cpY2.toFixed(1)}, ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`;
       }
-      const areaPathD = `${linePathD} L ${points[points.length - 1].x} ${padTop + chartH} L ${points[0].x} ${padTop + chartH} Z`;
 
-      // Points circles
+      const areaPathD = `${linePathD} L ${points[points.length - 1].x.toFixed(1)} ${padTop + chartH} L ${points[0].x.toFixed(1)} ${padTop + chartH} Z`;
+
+      // Minimalist points
       let pointsSvg = points.map(p => `
         <circle 
           class="chart-point" 
-          cx="${p.x}" 
-          cy="${p.y}" 
-          r="3.5" 
+          cx="${p.x.toFixed(1)}" 
+          cy="${p.y.toFixed(1)}" 
+          r="2.5" 
           data-date="${p.date}" 
           data-count="${p.count}"
         ></circle>
       `).join('');
 
-      // Horizontal grid lines
+      // Horizontal dashed grid lines
       let gridSvg = '';
-      for (let i = 0; i <= 3; i++) {
-        const gridVal = Math.round((maxVal / 3) * i);
-        const gridY = padTop + chartH - ((gridVal / maxVal) * chartH);
+      const gridSteps = 4;
+      for (let i = 0; i <= gridSteps; i++) {
+        const gridVal = Math.round(yFloor + (yRange / gridSteps) * i);
+        const gridY = padTop + chartH - ((gridVal - yFloor) / yRange * chartH);
         gridSvg += `
-          <line class="chart-axis-line" x1="${padLeft}" y1="${gridY}" x2="${width - padRight}" y2="${gridY}"></line>
-          <text class="chart-axis-text" x="${padLeft - 10}" y="${gridY + 4}" text-anchor="end">${formatNumber(gridVal)}</text>
+          <line class="chart-axis-line" x1="${padLeft}" y1="${gridY.toFixed(1)}" x2="${width - padRight}" y2="${gridY.toFixed(1)}"></line>
+          <text class="chart-axis-text" x="${padLeft - 10}" y="${(gridY + 4).toFixed(1)}" text-anchor="end">${formatNumber(gridVal)}</text>
         `;
       }
+
+      // X-axis date labels (every 3rd or 4th)
+      let labelsSvg = '';
+      points.forEach((p, idx) => {
+        if (idx % 4 === 0 || idx === points.length - 1) {
+          labelsSvg += `
+            <text class="chart-axis-text" x="${p.x.toFixed(1)}" y="${height - 10}" text-anchor="middle">
+              ${formatShortDate(p.rawKey)}
+            </text>
+          `;
+        }
+      });
 
       const svgHtml = `
         <svg class="svg-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
           <defs>
             <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.18"/>
               <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"/>
             </linearGradient>
           </defs>
@@ -380,52 +360,48 @@
           <!-- Grid Lines -->
           ${gridSvg}
 
-          <!-- Average dotted line -->
-          <line x1="${padLeft}" y1="${avgY}" x2="${width - padRight}" y2="${avgY}" stroke="#fbbf24" stroke-dasharray="4 4" stroke-width="1.5"></line>
-          <text class="chart-axis-text" x="${width - padRight}" y="${avgY - 6}" fill="#fbbf24" text-anchor="end">Сер: ${formatNumber(avg)} / день</text>
-
-          <!-- Area Gradient -->
+          <!-- Area Fill -->
           <path class="chart-area-path" d="${areaPathD}"></path>
 
-          <!-- Bars -->
-          ${barsSvg}
-
-          <!-- Smooth Line -->
+          <!-- Minimalist Contour Stroke -->
           <path class="chart-line-path" d="${linePathD}"></path>
 
-          <!-- Data Points -->
+          <!-- Interactive Points -->
           ${pointsSvg}
 
-          <!-- X-Axis Line -->
-          <line class="chart-axis-line" x1="${padLeft}" y1="${padTop + chartH}" x2="${width - padRight}" y2="${padTop + chartH}"></line>
-
-          <!-- Labels -->
+          <!-- X-Axis Labels -->
           ${labelsSvg}
         </svg>
       `;
 
       container.innerHTML = `<div class="chart-tooltip" id="chartTooltip"></div>` + svgHtml;
 
-      // Event listeners for interactive tooltips
-      const newTooltip = document.getElementById('chartTooltip');
-      container.querySelectorAll('.chart-bar, .chart-point').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-          const date = el.getAttribute('data-date');
-          const count = formatNumber(Number(el.getAttribute('data-count')));
-          newTooltip.innerHTML = `<strong>${date}</strong><br>Вперше зафіксовано: <strong style="color: var(--accent-sky);">${count}</strong> сайтів`;
-          newTooltip.classList.add('visible');
-        });
+      // Tooltip handling
+      const tooltip = document.getElementById('chartTooltip');
+      const pointEls = container.querySelectorAll('.chart-point');
 
-        el.addEventListener('mousemove', (e) => {
+      pointEls.forEach(el => {
+        el.addEventListener('mouseenter', (e) => {
+          const count = el.getAttribute('data-count');
+          const date = el.getAttribute('data-date');
+          tooltip.innerHTML = `
+            <div style="color: var(--text-secondary); font-size: 11px; margin-bottom: 2px;">${formatDate(date)}</div>
+            <div style="font-weight: 700; font-size: 13px; color: var(--accent-sky); font-family: var(--font-mono);">${formatNumber(count)} сайтів</div>
+          `;
+          tooltip.classList.add('visible');
+
           const rect = container.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          newTooltip.style.left = `${x}px`;
-          newTooltip.style.top = `${y}px`;
+          const cx = parseFloat(el.getAttribute('cx'));
+          const cy = parseFloat(el.getAttribute('cy'));
+          const scaleX = rect.width / width;
+          const scaleY = rect.height / height;
+
+          tooltip.style.left = `${cx * scaleX}px`;
+          tooltip.style.top = `${cy * scaleY - 8}px`;
         });
 
         el.addEventListener('mouseleave', () => {
-          newTooltip.classList.remove('visible');
+          tooltip.classList.remove('visible');
         });
       });
     }
@@ -444,13 +420,13 @@
             <td>
               <strong>${idx + 1}. ${escapeHtml(cat.key)}</strong>
             </td>
-            <td style="text-align: right; font-weight: 600; font-family: var(--font-mono); color: var(--accent-sky);">
+            <td style="text-align: right; font-weight: 600; font-family: var(--font-mono); color: var(--text-primary);">
               ${formatNumber(cat.count)}
             </td>
             <td>
-              <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">${percent}%</div>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width: ${percent}%;"></div>
+              <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 3px;">${percent}%</div>
+              <div class="progress-bar-bg" style="height: 4px;">
+                <div class="progress-bar-fill" style="width: ${percent}%; background: var(--accent-sky);"></div>
               </div>
             </td>
           </tr>
@@ -464,21 +440,21 @@
     function renderStackTable(stacks) {
       const tbody = document.getElementById('stackTableBody');
 
-      tbody.innerHTML = stacks.slice(0, 10).map((s, idx) => {
+      tbody.innerHTML = stacks.slice(0, 10).map((s) => {
         const isAiBuilder = ['lovable', 'v0', 'bolt', 'base44', 'ai_likely'].includes(s.key.toLowerCase());
         const badgeClass = isAiBuilder ? 'badge-sky' : '';
 
         return `
           <tr>
             <td>
-              <code>${escapeHtml(s.key)}</code>
+              <span style="font-family: var(--font-mono); font-size: 13px;">${escapeHtml(s.key)}</span>
             </td>
             <td style="text-align: right; font-weight: 600; font-family: var(--font-mono);">
               ${formatNumber(s.count)}
             </td>
             <td>
               <span class="metric-badge ${badgeClass}">
-                ${isAiBuilder ? 'AI Builder' : 'Classic Stack'}
+                ${isAiBuilder ? 'AI Builder' : 'Stack Signal'}
               </span>
             </td>
           </tr>

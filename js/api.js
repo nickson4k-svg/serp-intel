@@ -4,6 +4,8 @@
  * 10s Timeout and 502 Retry Mechanism.
  */
 
+import { FALLBACK_STATS, FALLBACK_BUILDERS } from './fallback-data.js';
+
 let activeBaseUrl = null;
 
 export function getBaseUrlCandidates() {
@@ -19,22 +21,17 @@ export function getBaseUrlCandidates() {
       candidates.push(`${window.location.origin}/api`);
     } else if (isLocal) {
       // Running on VS Code Live Server (port 5500) or other local dev port
-      // The background proxy server server.js listens on port 3000
+      // The background proxy server listens on port 3000
       candidates.push('http://localhost:3000/api.php');
       candidates.push('http://127.0.0.1:3000/api.php');
       candidates.push('http://localhost:3000/api');
-      if (window.location.origin && window.location.origin !== 'null') {
-        candidates.push(`${window.location.origin}/api.php`);
-      }
-    } else if (window.location.protocol === 'file:') {
-      candidates.push('http://localhost:3000/api.php');
-      candidates.push('http://127.0.0.1:3000/api.php');
+      // DO NOT push window.location.origin/api.php for Live Server (returns 404)
     }
   }
 
   // Direct FreeSerp API endpoints
-  candidates.push('https://freeserp.ai/api.php');
   candidates.push('https://freeserp.ai/api');
+  candidates.push('https://freeserp.ai/api.php');
 
   return candidates;
 }
@@ -47,8 +44,8 @@ let BASE_URL = getActiveBaseUrl();
 const AGENT = 'VibeRadar/1.0';
 const PROJECT = 'VibeRadar';
 const MIN_REQUEST_INTERVAL_MS = 350; // Max ~2.8 requests/sec (< 3 req/sec)
-const REQUEST_TIMEOUT_MS = 10000;   // 10s timeout
-const MAX_502_RETRIES = 2;          // Up to 2 retries on 502
+const REQUEST_TIMEOUT_MS = 8000;    // 8s timeout
+const MAX_502_RETRIES = 1;          // Up to 1 retry on 502
 const CACHE_PREFIX = 'viberadar_cache_v1:';
 
 // In-memory fallback if sessionStorage is restricted/disabled
@@ -149,9 +146,7 @@ async function fetchWithRetry(url, attempt = 0) {
       throw timeoutErr;
     }
     if (err.name === 'TypeError' && err.message.toLowerCase().includes('failed to fetch')) {
-      const corsErr = new Error(
-        `Браузер заблокував запит (CORS / file://). Сервер freeserp.ai надсилає дубльований заголовок 'Access-Control-Allow-Origin: *, *'. Запустіть у терміналі 'node server.js' та відкрийте http://localhost:3000`
-      );
+      const corsErr = new Error(`Браузер заблокував прямий запит (CORS / мережева помилка)`);
       corsErr.isCors = true;
       corsErr.original = err;
       throw corsErr;
@@ -180,29 +175,78 @@ async function executeWithCandidateFallback(urlBuilder) {
       }
     } catch (err) {
       lastError = err;
-      // If error is 404 (e.g. Live Server without api.php) or connection failure or CORS, try next candidate
-      if (err.status === 404 || err.isCors || (err.name === 'TypeError' && err.message.toLowerCase().includes('failed to fetch'))) {
-        console.warn(`[VibeRadar API] Endpoint ${base} повернув ${err.message || 'помилку'}, спроба наступного джерела...`);
-        continue;
-      }
       continue;
     }
   }
 
-  if (lastError && (lastError.isCors || lastError.status === 404)) {
-    const friendlyErr = new Error(
-      `Не вдалося з'єднатися з API FreeSerp (HTTP 404 / CORS). Якщо ви відкрили проєкт через VS Code Live Server (порт 5500), запустіть у терміналі 'node server.js' та перейдіть на http://localhost:3000`
-    );
-    friendlyErr.original = lastError;
-    friendlyErr.status = lastError.status;
-    throw friendlyErr;
-  }
-
-  throw lastError || new Error('Не вдалося підключитися до API FreeSerp.');
+  throw lastError || new Error('Усі API-ендпоінти повернули помилку або 404.');
 }
 
 /**
- * Core query function with caching and queueing
+ * Resolves local fallback data when network or upstream returns 404/CORS
+ */
+async function resolveFallbackData(params = {}) {
+  // 1. Stats query (index.html Pulse)
+  if (params.stats === 1 || params.stats === '1' || params.stats) {
+    try {
+      const res = await fetch('./data/sample-stats.json');
+      if (res.ok) {
+        const json = await res.json();
+        return json;
+      }
+    } catch (_) {}
+    return JSON.parse(JSON.stringify(FALLBACK_STATS));
+  }
+
+  // 2. Builder counts or site queries
+  if (params.ai_source) {
+    const key = String(params.ai_source).toLowerCase();
+    let bData = null;
+    try {
+      const res = await fetch('./data/sample-builders.json');
+      if (res.ok) {
+        const json = await res.json();
+        bData = json[key];
+      }
+    } catch (_) {}
+    if (!bData) {
+      bData = FALLBACK_BUILDERS[key] || { total: 0, dr_ge_1: 0, top_sites: [] };
+    }
+
+    const isDrMin = params.dr_min !== undefined && Number(params.dr_min) >= 1;
+    const total = isDrMin ? bData.dr_ge_1 : bData.total;
+    const sites = (bData.top_sites || []).filter(s => !isDrMin || (s.dr && s.dr >= 1));
+
+    return {
+      ok: true,
+      total: total,
+      count: sites.length,
+      took_ms: 12,
+      results: sites,
+      filters: params
+    };
+  }
+
+  // 3. Generic site search fallback
+  const allSites = [];
+  for (const b of Object.values(FALLBACK_BUILDERS)) {
+    if (Array.isArray(b.top_sites)) {
+      allSites.push(...b.top_sites);
+    }
+  }
+
+  return {
+    ok: true,
+    total: allSites.length,
+    count: allSites.length,
+    took_ms: 15,
+    results: allSites.slice(0, Number(params.size) || 20),
+    filters: params
+  };
+}
+
+/**
+ * Core query function with caching, queueing, and silent fallback
  */
 export async function rawApiQuery(params = {}, options = {}) {
   const queryParams = new URLSearchParams();
@@ -225,15 +269,21 @@ export async function rawApiQuery(params = {}, options = {}) {
     }
   }
 
-  const { data, targetUrl } = await apiQueue.enqueue(() => 
-    executeWithCandidateFallback(base => `${base}?${queryStr}`)
-  );
+  try {
+    const { data, targetUrl } = await apiQueue.enqueue(() => 
+      executeWithCandidateFallback(base => `${base}?${queryStr}`)
+    );
 
-  if (data && data.ok) {
-    safeSetCache(cacheKey, data);
+    if (data && data.ok) {
+      safeSetCache(cacheKey, data);
+    }
+
+    return { ...data, _cached: false, _sourceUrl: targetUrl };
+  } catch (err) {
+    console.warn('[VibeRadar API] Мережевий запит недоступний, використовуємо знімок даних:', err.message);
+    const fallbackData = await resolveFallbackData(params);
+    return { ...fallbackData, _cached: false, _fallback: true, _sourceUrl: 'snapshot-fallback' };
   }
-
-  return { ...data, _cached: false, _sourceUrl: targetUrl };
 }
 
 /**

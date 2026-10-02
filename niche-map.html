@@ -70,9 +70,6 @@
         <span class="legend-chip heat-max"></span>
         <span>50+ (домінування)</span>
       </div>
-      <div style="margin-left: auto; font-size: 11px; color: var(--text-muted);">
-        Джерело клітинки: <code>countBy({ ai_source, ai_categories })</code>
-      </div>
     </div>
 
     <!-- Heatmap Table -->
@@ -100,7 +97,7 @@
     <div class="modal-box">
       <div class="modal-header">
         <h3 id="modalHeading" style="font-size: 17px; font-weight: 700;">Деталі клітинки</h3>
-        <button id="closeModalBtn" class="btn btn-secondary" style="padding: 4px 10px; font-size: 13px;">✕</button>
+        <button id="closeModalBtn" class="btn btn-secondary" style="padding: 4px 10px; font-size: 13px;">Закрити</button>
       </div>
       <div class="modal-body" id="modalBody">
         Опитування API...
@@ -228,7 +225,7 @@
         }
       }
 
-      document.getElementById('progressText').textContent = '✅ Карту ніш успішно сформовано!';
+      document.getElementById('progressText').textContent = 'Карту ніш успішно сформовано.';
       setTimeout(() => {
         document.getElementById('progressWrap').style.display = 'none';
       }, 1000);

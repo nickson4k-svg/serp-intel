@@ -14,10 +14,10 @@
   <main class="container" role="main">
     <section class="page-hero">
       <div class="page-hero-title">
-        <h1>Builders: Битва AI-білдерів</h1>
+        <h1>Builders: Порівняння AI-платформ</h1>
         <span class="live-indicator">
           <span class="live-dot"></span>
-          Запити через countBy
+          Аналітика платформ
         </span>
       </div>
       <p class="page-hero-subtitle">
@@ -41,13 +41,13 @@
     <!-- Cards Grid -->
     <div class="builders-grid" id="buildersGrid">
       <!-- 1. Lovable -->
-      <article class="builder-card card-accent-rose" id="card-lovable">
+      <article class="builder-card" id="card-lovable">
         <div class="builder-header">
           <div class="builder-title">
             <div class="builder-logo logo-lovable">L</div>
             <span>Lovable</span>
           </div>
-          <span class="metric-badge badge-rose">ai_source=lovable</span>
+          <span class="metric-badge">AI Platform</span>
         </div>
 
         <div class="builder-card-error" id="err-lovable" style="display: none;"></div>
@@ -55,18 +55,16 @@
         <div class="builder-stats">
           <div class="stat-row">
             <span class="stat-row-label">Всього сайтів у індексі</span>
-            <div class="stat-row-val" id="total-lovable">
+            <div class="stat-row-val font-mono" id="total-lovable">
               <span class="skeleton" style="width: 100px; height: 32px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'lovable' })</code></div>
           </div>
 
           <div class="stat-row">
             <span class="stat-row-label">Частка сайтів з DR &ge; 1</span>
-            <div class="stat-row-val" id="dr-lovable">
+            <div class="stat-row-val font-mono" id="dr-lovable">
               <span class="skeleton" style="width: 130px; height: 32px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'lovable', dr_min: 1 })</code></div>
           </div>
 
           <div class="stat-row">
@@ -76,25 +74,24 @@
               <span class="skeleton" style="width: 100%; height: 28px;"></span>
               <span class="skeleton" style="width: 100%; height: 28px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'lovable', ai_categories })</code></div>
           </div>
         </div>
 
         <div class="card-footer-actions">
           <button class="btn btn-secondary" style="width: 100%; font-size: 13px;" onclick="showTopSites('lovable', 'Lovable')">
-            🔍 Переглянути топ-5 за DR
+            Топ-5 сайтів за DR
           </button>
         </div>
       </article>
 
       <!-- 2. v0 -->
-      <article class="builder-card card-accent-indigo" id="card-v0">
+      <article class="builder-card" id="card-v0">
         <div class="builder-header">
           <div class="builder-title">
             <div class="builder-logo logo-v0">v0</div>
             <span>v0 (Vercel)</span>
           </div>
-          <span class="metric-badge badge-indigo">ai_source=v0</span>
+          <span class="metric-badge">AI Platform</span>
         </div>
 
         <div class="builder-card-error" id="err-v0" style="display: none;"></div>
@@ -102,18 +99,16 @@
         <div class="builder-stats">
           <div class="stat-row">
             <span class="stat-row-label">Всього сайтів у індексі</span>
-            <div class="stat-row-val" id="total-v0">
+            <div class="stat-row-val font-mono" id="total-v0">
               <span class="skeleton" style="width: 100px; height: 32px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'v0' })</code></div>
           </div>
 
           <div class="stat-row">
             <span class="stat-row-label">Частка сайтів з DR &ge; 1</span>
-            <div class="stat-row-val" id="dr-v0">
+            <div class="stat-row-val font-mono" id="dr-v0">
               <span class="skeleton" style="width: 130px; height: 32px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'v0', dr_min: 1 })</code></div>
           </div>
 
           <div class="stat-row">
@@ -123,25 +118,24 @@
               <span class="skeleton" style="width: 100%; height: 28px;"></span>
               <span class="skeleton" style="width: 100%; height: 28px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'v0', ai_categories })</code></div>
           </div>
         </div>
 
         <div class="card-footer-actions">
           <button class="btn btn-secondary" style="width: 100%; font-size: 13px;" onclick="showTopSites('v0', 'v0 by Vercel')">
-            🔍 Переглянути топ-5 за DR
+            Топ-5 сайтів за DR
           </button>
         </div>
       </article>
 
       <!-- 3. Bolt -->
-      <article class="builder-card card-accent-amber" id="card-bolt">
+      <article class="builder-card" id="card-bolt">
         <div class="builder-header">
           <div class="builder-title">
-            <div class="builder-logo logo-bolt">⚡</div>
+            <div class="builder-logo logo-bolt">B</div>
             <span>Bolt.new</span>
           </div>
-          <span class="metric-badge badge-amber">ai_source=bolt</span>
+          <span class="metric-badge">AI Platform</span>
         </div>
 
         <div class="builder-card-error" id="err-bolt" style="display: none;"></div>
@@ -149,18 +143,16 @@
         <div class="builder-stats">
           <div class="stat-row">
             <span class="stat-row-label">Всього сайтів у індексі</span>
-            <div class="stat-row-val" id="total-bolt">
+            <div class="stat-row-val font-mono" id="total-bolt">
               <span class="skeleton" style="width: 100px; height: 32px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'bolt' })</code></div>
           </div>
 
           <div class="stat-row">
             <span class="stat-row-label">Частка сайтів з DR &ge; 1</span>
-            <div class="stat-row-val" id="dr-bolt">
+            <div class="stat-row-val font-mono" id="dr-bolt">
               <span class="skeleton" style="width: 130px; height: 32px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'bolt', dr_min: 1 })</code></div>
           </div>
 
           <div class="stat-row">
@@ -170,25 +162,24 @@
               <span class="skeleton" style="width: 100%; height: 28px;"></span>
               <span class="skeleton" style="width: 100%; height: 28px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'bolt', ai_categories })</code></div>
           </div>
         </div>
 
         <div class="card-footer-actions">
           <button class="btn btn-secondary" style="width: 100%; font-size: 13px;" onclick="showTopSites('bolt', 'Bolt.new')">
-            🔍 Переглянути топ-5 за DR
+            Топ-5 сайтів за DR
           </button>
         </div>
       </article>
 
       <!-- 4. Base44 -->
-      <article class="builder-card card-accent-sky" id="card-base44">
+      <article class="builder-card" id="card-base44">
         <div class="builder-header">
           <div class="builder-title">
             <div class="builder-logo logo-base44">44</div>
             <span>Base44</span>
           </div>
-          <span class="metric-badge badge-sky">ai_source=base44</span>
+          <span class="metric-badge">AI Platform</span>
         </div>
 
         <div class="builder-card-error" id="err-base44" style="display: none;"></div>
@@ -196,18 +187,16 @@
         <div class="builder-stats">
           <div class="stat-row">
             <span class="stat-row-label">Всього сайтів у індексі</span>
-            <div class="stat-row-val" id="total-base44">
+            <div class="stat-row-val font-mono" id="total-base44">
               <span class="skeleton" style="width: 100px; height: 32px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'base44' })</code></div>
           </div>
 
           <div class="stat-row">
             <span class="stat-row-label">Частка сайтів з DR &ge; 1</span>
-            <div class="stat-row-val" id="dr-base44">
+            <div class="stat-row-val font-mono" id="dr-base44">
               <span class="skeleton" style="width: 130px; height: 32px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'base44', dr_min: 1 })</code></div>
           </div>
 
           <div class="stat-row">
@@ -217,13 +206,12 @@
               <span class="skeleton" style="width: 100%; height: 28px;"></span>
               <span class="skeleton" style="width: 100%; height: 28px;"></span>
             </div>
-            <div class="source-tag">запит: <code>countBy({ ai_source: 'base44', ai_categories })</code></div>
           </div>
         </div>
 
         <div class="card-footer-actions">
           <button class="btn btn-secondary" style="width: 100%; font-size: 13px;" onclick="showTopSites('base44', 'Base44')">
-            🔍 Переглянути топ-5 за DR
+            Топ-5 сайтів за DR
           </button>
         </div>
       </article>
@@ -233,9 +221,8 @@
     <section class="section" aria-labelledby="summary-heading">
       <div class="section-header">
         <h2 id="summary-heading" class="section-title">
-          <span>📋 Зведена порівняльна таблиця</span>
+          <span>Зведена порівняльна таблиця</span>
         </h2>
-        <div class="source-tag">джерело: агрегація запитів <code>countBy</code></div>
       </div>
 
       <div class="card">
@@ -291,7 +278,7 @@
     <div class="modal-box">
       <div class="modal-header">
         <h3 id="modalTitle" style="font-size: 17px; font-weight: 700;">Топ-сайти</h3>
-        <button id="closeModalBtn" class="btn btn-secondary" style="padding: 4px 10px; font-size: 13px;">✕</button>
+        <button id="closeModalBtn" class="btn btn-secondary" style="padding: 4px 10px; font-size: 13px;">Закрити</button>
       </div>
       <div class="modal-body" id="modalBody">
         Завантаження...
