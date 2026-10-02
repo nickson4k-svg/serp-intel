@@ -40,7 +40,7 @@
     <div id="progressWrap" style="margin-bottom: 20px;">
       <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">
         <span id="progressText">Ініціалізація опитування матриці...</span>
-        <span id="progressPercent">0%</span>
+        <span id="progressPercent" class="font-mono tabular-nums" style="font-weight: 500; color: var(--text-primary);">0%</span>
       </div>
       <div class="progress-bar-bg">
         <div id="progressFill" class="progress-bar-fill" style="width: 2%;"></div>
@@ -82,7 +82,7 @@
             <th>v0 (Vercel)</th>
             <th>Bolt.new</th>
             <th>Base44</th>
-            <th style="min-width: 80px;">Разом</th>
+            <th style="min-width: 70px; text-align: right;">Разом</th>
           </tr>
         </thead>
         <tbody id="heatmapBody">
@@ -96,8 +96,8 @@
   <div class="modal-backdrop" id="nicheModal" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
     <div class="modal-box">
       <div class="modal-header">
-        <h3 id="modalHeading" style="font-size: 17px; font-weight: 700;">Деталі клітинки</h3>
-        <button id="closeModalBtn" class="btn btn-secondary" style="padding: 4px 10px; font-size: 13px;">Закрити</button>
+        <h3 id="modalHeading" class="modal-title">Деталі клітинки</h3>
+        <button id="closeModalBtn" class="btn btn-secondary" style="height: 28px; padding: 0 10px; font-size: 12px;">Закрити</button>
       </div>
       <div class="modal-body" id="modalBody">
         Опитування API...
@@ -170,7 +170,7 @@
               <span class="skeleton" style="width: 28px; height: 16px;"></span>
             </td>
           `).join('')}
-          <td style="text-align: center; font-family: var(--font-mono); font-weight: 700;" id="total-${nIdx}">
+          <td style="text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; padding-right: 12px;" id="total-${nIdx}">
             —
           </td>
         </tr>
@@ -287,9 +287,7 @@
                   <strong style="font-size: 15px;">
                     ${i + 1}. <a href="${escapeHtml(site.url || 'https://' + site.domain)}" target="_blank" rel="noopener">${escapeHtml(site.domain)}</a>
                   </strong>
-                  <span class="metric-badge" style="background: rgba(16, 185, 129, 0.2); color: var(--color-success); font-weight: 700;">
-                    DR ${site.dr ?? 0}
-                  </span>
+                  <span class="metric-badge badge-emerald font-mono tabular-nums">DR ${site.dr ?? 0}</span>
                 </div>
                 <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">
                   ${escapeHtml(site.title || 'Без назви')}
@@ -300,7 +298,7 @@
                   </div>
                 ` : ''}
                 <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 12px; flex-wrap: wrap;">
-                  <span>Вперше зафіксовано живим: <strong>${site.went_live || '—'}</strong></span>
+                  <span>Вперше зафіксовано живим: <strong class="font-mono tabular-nums">${site.went_live || '—'}</strong></span>
                   <span>HTTP: <code>${site.http_status || 200}</code></span>
                 </div>
               </div>

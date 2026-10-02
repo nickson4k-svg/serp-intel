@@ -74,21 +74,21 @@
         <div class="audit-header-card">
           <div>
             <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Результати аудиту для домену:</div>
-            <h2 style="font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 10px;" id="domainHeaderTitle">
+            <h2 style="font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px;" id="domainHeaderTitle">
               base44.com
             </h2>
             <div style="font-size: 13.5px; color: var(--text-secondary); margin-top: 4px;" id="domainPageTitle">
               Vibe Coding Platform
             </div>
             <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 8px; display: flex; gap: 14px; flex-wrap: wrap;" id="domainMetaTags">
-              <span>вперше зафіксовано живим: <strong id="valWentLive">—</strong></span>
+              <span>вперше зафіксовано живим: <strong id="valWentLive" class="font-mono tabular-nums">—</strong></span>
               <span>Стек: <code id="valAiSource">—</code></span>
               <span>Сервер: <code id="valWebserver">—</code></span>
             </div>
           </div>
 
           <div class="audit-score-wrap">
-            <div class="score-badge-circle score-green" id="scoreBadge">85%</div>
+            <div class="score-badge-circle score-green font-mono tabular-nums" id="scoreBadge">85%</div>
             <div>
               <div style="font-size: 16px; font-weight: 800; color: var(--text-primary);" id="scoreRatingText">Висока гігієна</div>
               <div style="font-size: 12px; color: var(--text-muted);" id="scoreRulesPassed">6 із 7 правил пройдено</div>
@@ -291,13 +291,13 @@
         const scoreBadge = document.getElementById('scoreBadge');
         scoreBadge.textContent = `${totalScore}%`;
         if (totalScore >= 75) {
-          scoreBadge.className = 'score-badge-circle score-green';
+          scoreBadge.className = 'score-badge-circle score-green font-mono tabular-nums';
           document.getElementById('scoreRatingText').textContent = 'Висока гігієна';
         } else if (totalScore >= 45) {
-          scoreBadge.className = 'score-badge-circle score-amber';
+          scoreBadge.className = 'score-badge-circle score-amber font-mono tabular-nums';
           document.getElementById('scoreRatingText').textContent = 'Потребує оптимізації';
         } else {
-          scoreBadge.className = 'score-badge-circle score-red';
+          scoreBadge.className = 'score-badge-circle score-red font-mono tabular-nums';
           document.getElementById('scoreRatingText').textContent = 'Критичні прогалини';
         }
         document.getElementById('scoreRulesPassed').textContent = `${passedCount} із ${SEO_HYGIENE_RULES.length} правил виконано`;
@@ -308,7 +308,7 @@
           <div class="rule-card ${r.passed ? 'rule-passed' : 'rule-failed'}">
             <div class="rule-top">
               <span class="rule-name">${escapeHtml(r.name)}</span>
-              <span class="rule-badge ${r.passed ? 'badge-passed' : 'badge-failed'}">
+              <span class="rule-badge ${r.passed ? 'badge-passed' : 'badge-failed'} font-mono tabular-nums">
                 ${r.passed ? 'Виконано' : 'Не виконано'} (+${r.passed ? r.weight : 0} / ${r.weight})
               </span>
             </div>
@@ -335,6 +335,14 @@
         .replace(/"/g, '&quot;');
     }
 
+    document.getElementById('searchForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      runTeardown();
+    });
+    document.getElementById('searchBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      runTeardown();
+    });
     // Run initial on load
     runTeardown();
   </script>

@@ -20,20 +20,22 @@
     }
     .status {
       font-size: 11px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: var(--radius-sm);
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 9999px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
     }
-    .status.pending { background: rgba(251, 191, 36, 0.15); color: var(--accent-amber); border: 1px solid rgba(251, 191, 36, 0.3); }
-    .status.pass    { background: rgba(52, 211, 153, 0.15); color: var(--accent-emerald); border: 1px solid rgba(52, 211, 153, 0.3); }
-    .status.fail    { background: rgba(251, 113, 133, 0.15); color: var(--accent-rose); border: 1px solid rgba(251, 113, 133, 0.3); }
+    .status.pending { background: #27272a; color: #a1a1aa; border: 1px solid rgba(63, 63, 70, 0.5); }
+    .status.pass    { background: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-success-border); }
+    .status.fail    { background: var(--color-danger-bg); color: var(--color-danger); border: 1px solid var(--color-danger-border); }
     pre {
-      background: rgba(2, 6, 23, 0.85);
+      background: #18181b;
       border: 1px solid var(--border-card);
       padding: 12px;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-sm);
       font-size: 11.5px;
       color: var(--text-primary);
       overflow-x: auto;
@@ -53,7 +55,7 @@
 <body>
   <div class="test-header">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-      <h1 style="font-size: 26px; font-weight: 800; letter-spacing: -0.025em; margin: 0;">
+      <h1 style="font-size: 1.25rem; font-weight: 600; letter-spacing: -0.025em; margin: 0;">
         VibeRadar API Data Layer Tests
       </h1>
       <span class="metric-badge badge-sky">Live API Verification</span>

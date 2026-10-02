@@ -352,8 +352,8 @@
         <svg class="svg-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
           <defs>
             <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.18"/>
-              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"/>
+              <stop offset="0%" stop-color="#a1a1aa" stop-opacity="0.08"/>
+              <stop offset="100%" stop-color="#a1a1aa" stop-opacity="0.0"/>
             </linearGradient>
           </defs>
 
@@ -386,7 +386,7 @@
           const date = el.getAttribute('data-date');
           tooltip.innerHTML = `
             <div style="color: var(--text-secondary); font-size: 11px; margin-bottom: 2px;">${formatDate(date)}</div>
-            <div style="font-weight: 700; font-size: 13px; color: var(--accent-sky); font-family: var(--font-mono);">${formatNumber(count)} сайтів</div>
+            <div style="font-weight: 600; font-size: 12px; color: var(--text-primary); font-family: var(--font-mono); font-variant-numeric: tabular-nums;">${formatNumber(count)} сайтів</div>
           `;
           tooltip.classList.add('visible');
 
@@ -418,15 +418,15 @@
         return `
           <tr>
             <td>
-              <strong>${idx + 1}. ${escapeHtml(cat.key)}</strong>
+              <span>${idx + 1}. ${escapeHtml(cat.key)}</span>
             </td>
-            <td style="text-align: right; font-weight: 600; font-family: var(--font-mono); color: var(--text-primary);">
+            <td style="text-align: right; font-weight: 500; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-primary);">
               ${formatNumber(cat.count)}
             </td>
             <td>
-              <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 3px;">${percent}%</div>
+              <div style="font-size: 10px; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-muted); margin-bottom: 2px;">${percent}%</div>
               <div class="progress-bar-bg" style="height: 4px;">
-                <div class="progress-bar-fill" style="width: ${percent}%; background: var(--accent-sky);"></div>
+                <div class="progress-bar-fill" style="width: ${percent}%; background: #a1a1aa;"></div>
               </div>
             </td>
           </tr>
@@ -442,18 +442,17 @@
 
       tbody.innerHTML = stacks.slice(0, 10).map((s) => {
         const isAiBuilder = ['lovable', 'v0', 'bolt', 'base44', 'ai_likely'].includes(s.key.toLowerCase());
-        const badgeClass = isAiBuilder ? 'badge-sky' : '';
 
         return `
           <tr>
             <td>
-              <span style="font-family: var(--font-mono); font-size: 13px;">${escapeHtml(s.key)}</span>
+              <span style="font-family: var(--font-mono); font-size: 12.5px;">${escapeHtml(s.key)}</span>
             </td>
-            <td style="text-align: right; font-weight: 600; font-family: var(--font-mono);">
+            <td style="text-align: right; font-weight: 500; font-family: var(--font-mono); font-variant-numeric: tabular-nums;">
               ${formatNumber(s.count)}
             </td>
-            <td>
-              <span class="metric-badge ${badgeClass}">
+            <td style="text-align: right;">
+              <span class="metric-badge">
                 ${isAiBuilder ? 'AI Builder' : 'Stack Signal'}
               </span>
             </td>

@@ -31,7 +31,7 @@
     <div id="loadingProgressWrap" style="margin-bottom: 24px;">
       <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">
         <span id="progressStatusText">Асинхронне опитування індексу FreeSerp...</span>
-        <span id="progressPercent" style="font-family: var(--font-mono); font-weight: 600; color: var(--accent-sky);">0%</span>
+        <span id="progressPercent" class="font-mono tabular-nums" style="font-weight: 500; color: var(--text-primary);">0%</span>
       </div>
       <div class="progress-bar-bg">
         <div id="progressFill" class="progress-bar-fill" style="width: 5%;"></div>
@@ -240,30 +240,30 @@
             <tbody id="summaryTableBody">
               <tr>
                 <td><strong>Lovable</strong> (<code>lovable</code>)</td>
-                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-lovable">—</td>
-                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-lovable">—</td>
-                <td style="text-align: right; font-weight: 700;" id="sum-ratio-lovable">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-lovable" class="font-mono tabular-nums">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-lovable" class="font-mono tabular-nums">—</td>
+                <td style="text-align: right; font-weight: 700;" id="sum-ratio-lovable" class="font-mono tabular-nums">—</td>
                 <td id="sum-niche-lovable">—</td>
               </tr>
               <tr>
                 <td><strong>v0 by Vercel</strong> (<code>v0</code>)</td>
-                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-v0">—</td>
-                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-v0">—</td>
-                <td style="text-align: right; font-weight: 700;" id="sum-ratio-v0">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-v0" class="font-mono tabular-nums">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-v0" class="font-mono tabular-nums">—</td>
+                <td style="text-align: right; font-weight: 700;" id="sum-ratio-v0" class="font-mono tabular-nums">—</td>
                 <td id="sum-niche-v0">—</td>
               </tr>
               <tr>
                 <td><strong>Bolt.new</strong> (<code>bolt</code>)</td>
-                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-bolt">—</td>
-                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-bolt">—</td>
-                <td style="text-align: right; font-weight: 700;" id="sum-ratio-bolt">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-bolt" class="font-mono tabular-nums">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-bolt" class="font-mono tabular-nums">—</td>
+                <td style="text-align: right; font-weight: 700;" id="sum-ratio-bolt" class="font-mono tabular-nums">—</td>
                 <td id="sum-niche-bolt">—</td>
               </tr>
               <tr>
                 <td><strong>Base44</strong> (<code>base44</code>)</td>
-                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-base44">—</td>
-                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-base44">—</td>
-                <td style="text-align: right; font-weight: 700;" id="sum-ratio-base44">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-base44" class="font-mono tabular-nums">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-base44" class="font-mono tabular-nums">—</td>
+                <td style="text-align: right; font-weight: 700;" id="sum-ratio-base44" class="font-mono tabular-nums">—</td>
                 <td id="sum-niche-base44">—</td>
               </tr>
             </tbody>
@@ -277,7 +277,7 @@
   <div class="modal-backdrop" id="sitesModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-box">
       <div class="modal-header">
-        <h3 id="modalTitle" style="font-size: 17px; font-weight: 700;">Топ-сайти</h3>
+        <h3 id="modalTitle" class="modal-title">Топ-сайти</h3>
         <button id="closeModalBtn" class="btn btn-secondary" style="padding: 4px 10px; font-size: 13px;">Закрити</button>
       </div>
       <div class="modal-body" id="modalBody">
@@ -465,7 +465,7 @@
                   </div>
                 ` : ''}
                 <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 12px; flex-wrap: wrap;">
-                  <span>Вперше зафіксовано живим: <strong>${site.went_live || '—'}</strong></span>
+                  <span>Вперше зафіксовано живим: <strong class="font-mono tabular-nums">${site.went_live || '—'}</strong></span>
                   ${site.ai_categories ? `<span>Категорії: <em>${site.ai_categories.join(', ')}</em></span>` : ''}
                 </div>
               </div>
