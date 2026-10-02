@@ -16,12 +16,16 @@ export function getBaseUrlCandidates() {
     const hostname = window.location.hostname;
     const origin   = window.location.origin;
 
-    // 1. Same-origin proxy (works for Vercel /api.php and local proxy on 4000)
+    // 1. Same-origin proxy endpoints:
+    // /api works natively on Vercel via api/index.js and avoids WAF/firewall blocks on .php
+    candidates.push(`${origin}/api`);
     candidates.push(`${origin}/api.php`);
 
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       // If frontend runs on a different port (e.g. IDE live server), connect to local proxy on 4000
+      candidates.push('http://localhost:4000/api');
       candidates.push('http://localhost:4000/api.php');
+      candidates.push('http://127.0.0.1:4000/api');
       candidates.push('http://127.0.0.1:4000/api.php');
     }
   }
