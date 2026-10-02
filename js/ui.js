@@ -94,21 +94,12 @@ export function renderHeader(activePage = 'pulse') {
   document.getElementById('themeToggleBtn')?.addEventListener('click', toggleTheme);
 }
 
-// 3. Footer renderer
+// 3. Footer renderer (removed per request)
 export function renderFooter() {
   const footer = document.querySelector('.site-footer');
-  if (!footer) return;
-
-  footer.innerHTML = `
-    <div class="container footer-inner">
-      <div>
-        <strong>VibeRadar</strong> — Аналітична платформа екосистеми вебсайтів та AI-білдерів на базі індексу <a href="https://freeserp.ai" target="_blank" rel="noopener">FreeSerp.ai</a>.
-      </div>
-      <div>
-        Дані глобального індексу (20M+ сайтів). Дата live відповідає моменту першої фіксації домену живим у веб-просторі.
-      </div>
-    </div>
-  `;
+  if (footer) {
+    footer.remove();
+  }
 }
 
 // 4. Formatting Utilities
