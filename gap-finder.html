@@ -98,6 +98,7 @@
         <h2 id="sites-list-heading" class="section-title">
           <span>Сайти конкурентів у вибраному сегменті</span>
         </h2>
+        <p id="querySourceTag" style="font-size: 12px; color: var(--text-muted); margin-top: 4px; font-family: var(--font-mono);"></p>
       </div>
 
       <div class="card">
@@ -131,13 +132,30 @@
     renderFooter();
 
     async function analyzeGap() {
-      const niche = document.getElementById('nicheSelect').value;
-      const drMax = parseInt(document.getElementById('drMaxSelect').value, 10);
-      const aiSource = document.getElementById('aiSourceSelect').value;
+      // Null-guard all critical DOM elements up front
+      const nicheEl       = document.getElementById('nicheSelect');
+      const drMaxEl       = document.getElementById('drMaxSelect');
+      const aiSourceEl    = document.getElementById('aiSourceSelect');
+      const tbodyEl       = document.getElementById('gapSitesTableBody');
+      const nicheTitle    = document.getElementById('oppNicheTitle');
+      const scoreVal      = document.getElementById('oppScoreVal');
+      const totalEl       = document.getElementById('oppTotalSites');
+      const lowDrEl       = document.getElementById('oppLowDrSites');
+      const ratioEl       = document.getElementById('oppVulnerableRatio');
+      const queryTag      = document.getElementById('querySourceTag');
 
-      document.getElementById('oppNicheTitle').textContent = niche;
-      document.getElementById('oppScoreVal').textContent = '...';
-      document.getElementById('gapSitesTableBody').innerHTML = 
+      if (!nicheEl || !drMaxEl || !tbodyEl) {
+        console.error('[GapFinder] Критичні елементи DOM не знайдено — перевірте розмітку сторінки.');
+        return;
+      }
+
+      const niche    = nicheEl.value;
+      const drMax    = parseInt(drMaxEl.value, 10);
+      const aiSource = aiSourceEl ? aiSourceEl.value : '';
+
+      if (nicheTitle) nicheTitle.textContent = niche;
+      if (scoreVal)   scoreVal.textContent = '...';
+      tbodyEl.innerHTML =
         '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Опитування індексу FreeSerp...</td></tr>';
 
       try {
@@ -152,13 +170,13 @@
         const lowDrRes = await countBy(lowDrFilters);
         const lowDr = lowDrRes.total;
 
-        const ratio = total > 0 ? (lowDr / total) * 100 : 0;
+        const ratio    = total > 0 ? (lowDr / total) * 100 : 0;
         const oppScore = Math.min(99, Math.round(ratio * 0.9 + 10));
 
-        document.getElementById('oppTotalSites').textContent = formatNumber(total);
-        document.getElementById('oppLowDrSites').textContent = formatNumber(lowDr);
-        document.getElementById('oppVulnerableRatio').textContent = formatPercent(ratio);
-        document.getElementById('oppScoreVal').textContent = oppScore;
+        if (totalEl)  totalEl.textContent  = formatNumber(total);
+        if (lowDrEl)  lowDrEl.textContent  = formatNumber(lowDr);
+        if (ratioEl)  ratioEl.textContent  = formatPercent(ratio);
+        if (scoreVal) scoreVal.textContent = oppScore;
 
         // 3. Search actual sites
         const searchFilters = {
@@ -168,18 +186,20 @@
           size: 15
         };
 
-        document.getElementById('querySourceTag').innerHTML = 
-          `запит: <code>searchSites({ ai_categories: '${niche}', dr_max: ${drMax}${aiSource ? `, ai_source: '${aiSource}'` : ''} })</code>`;
+        // Safe update of query debug tag (element may be absent in some builds)
+        if (queryTag) {
+          queryTag.innerHTML =
+            `запит: <code>searchSites({ ai_categories: '${escapeHtml(niche)}', dr_max: ${drMax}${aiSource ? `, ai_source: '${escapeHtml(aiSource)}'` : ''} })</code>`;
+        }
 
         const sitesRes = await searchSites(searchFilters);
-        const tbody = document.getElementById('gapSitesTableBody');
 
         if (!sitesRes.results || sitesRes.results.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Сайтів за цими критеріями не знайдено.</td></tr>';
+          tbodyEl.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Сайтів за цими критеріями не знайдено.</td></tr>';
           return;
         }
 
-        tbody.innerHTML = sitesRes.results.map(s => `
+        tbodyEl.innerHTML = sitesRes.results.map(s => `
           <tr>
             <td>
               <div>
@@ -198,18 +218,21 @@
               <code>${escapeHtml(s.ai_source || 'not_ai')}</code>
             </td>
             <td style="font-size: 12.5px;">
-              <span>вперше зафіксовано живим: <strong>${s.went_live || '—'}</strong></span>
+              <span>вперше зафіксовано живим: <strong>${escapeHtml(s.went_live || '—')}</strong></span>
             </td>
             <td style="font-size: 11.5px; color: var(--text-muted);">
-              ${s.ai_categories ? s.ai_categories.join(', ') : '—'}
+              ${Array.isArray(s.ai_categories) ? escapeHtml(s.ai_categories.join(', ')) : '—'}
             </td>
           </tr>
         `).join('');
 
       } catch (err) {
-        console.error('Gap analysis error:', err);
-        document.getElementById('gapSitesTableBody').innerHTML = 
-          `<tr><td colspan="5" class="alert alert-danger">Помилка аналізу: ${escapeHtml(err.message)}</td></tr>`;
+        console.error('[GapFinder] Gap analysis error:', err);
+        if (tbodyEl) {
+          tbodyEl.innerHTML =
+            `<tr><td colspan="5" style="padding: 16px; color: var(--text-secondary); font-size: 13px;">` +
+            `Дані завантажено зі знімка (мережа недоступна). Повторіть спробу пізніше.</td></tr>`;
+        }
       }
     }
 

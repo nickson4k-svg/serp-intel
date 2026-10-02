@@ -17,21 +17,21 @@ export function getBaseUrlCandidates() {
     const port = window.location.port;
 
     if (port === '3000') {
+      // Running via local proxy server — proxy handles CORS + routes /api.php to root
       candidates.push(`${window.location.origin}/api.php`);
-      candidates.push(`${window.location.origin}/api`);
     } else if (isLocal) {
-      // Running on VS Code Live Server (port 5500) or other local dev port
+      // Running on VS Code Live Server or other non-3000 local port
       // The background proxy server listens on port 3000
       candidates.push('http://localhost:3000/api.php');
       candidates.push('http://127.0.0.1:3000/api.php');
-      candidates.push('http://localhost:3000/api');
-      // DO NOT push window.location.origin/api.php for Live Server (returns 404)
     }
   }
 
-  // Direct FreeSerp API endpoints
-  candidates.push('https://freeserp.ai/api');
+  // Direct FreeSerp API endpoints (confirmed 200 JSON via server-side probe)
+  // NOTE: Browser fetch hits CORS duplicate header bug; proxy at /api.php on localhost:3000 solves this.
+  // These are fallback attempts if no local proxy is found.
   candidates.push('https://freeserp.ai/api.php');
+  candidates.push('https://freeserp.ai/api');
 
   return candidates;
 }
@@ -145,7 +145,16 @@ async function fetchWithRetry(url, attempt = 0) {
       timeoutErr.isTimeout = true;
       throw timeoutErr;
     }
-    if (err.name === 'TypeError' && err.message.toLowerCase().includes('failed to fetch')) {
+    // Catch CORS failures: browser raises TypeError with 'Failed to fetch' or
+    // 'NetworkError' when a CORS violation (e.g. duplicate "*, *" header) occurs.
+    if (
+      err.name === 'TypeError' &&
+      (
+        err.message.toLowerCase().includes('failed to fetch') ||
+        err.message.toLowerCase().includes('networkerror') ||
+        err.message.toLowerCase().includes('network request failed')
+      )
+    ) {
       const corsErr = new Error(`Браузер заблокував прямий запит (CORS / мережева помилка)`);
       corsErr.isCors = true;
       corsErr.original = err;
