@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teardown — VibeRadar | Глибокий аудит SEO-гігієни домену</title>
+  <meta name="description" content="Глибокий розбір технічного стану та SEO-гігієни будь-якого домену за формалізованим масивом правил FreeSerp.">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .search-bar-wrap {
+      background: var(--bg-card);
+      backdrop-filter: var(--backdrop-blur);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+    .search-form {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 260px;
+    }
+    .quick-chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .chip {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border-subtle);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all var(--transition-fast);
+    }
+    .chip:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-accent);
+    }
+
+    .audit-header-card {
+      background: var(--bg-card);
+      backdrop-filter: var(--backdrop-blur);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .audit-score-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .score-badge-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: var(--shadow-md);
+    }
+    .score-green { background: linear-gradient(135deg, #10b981, #059669); }
+    .score-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .score-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+    .rules-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .rule-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color var(--transition-fast);
+    }
+    .rule-card.rule-passed {
+      border-left: 4px solid var(--color-success);
+    }
+    .rule-card.rule-failed {
+      border-left: 4px solid var(--color-danger);
+    }
+    .rule-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .rule-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .rule-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+    .badge-passed { background: rgba(16, 185, 129, 0.15); color: var(--color-success); }
+    .badge-failed { background: rgba(239, 68, 68, 0.15); color: var(--color-danger); }
+    .rule-explain {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+    .rule-details {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: var(--bg-card-hover);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+    }
+    .not-found-card {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header" role="banner"></header>
+
+  <main class="container" role="main">
+    <section class="page-hero">
+      <div class="page-hero-title">
+        <h1>Teardown: Аудит SEO-гігієни</h1>
+        <span class="live-indicator">
+          <span class="live-dot"></span>
+          Аналіз за правилами
+        </span>
+      </div>
+      <p class="page-hero-subtitle">
+        Діагностика домену за 7 формалізованими критеріями технічної та пошукової гігієни. 
+        Усі правила винесено у прозорий масив із детальними поясненнями.
+      </p>
+    </section>
+
+    <!-- Search Form -->
+    <div class="search-bar-wrap">
+      <form class="search-form" id="searchForm" onsubmit="event.preventDefault(); runTeardown();">
+        <input 
+          type="text" 
+          id="domainInput" 
+          class="form-control search-input" 
+          placeholder="Введіть домен (наприклад, lovable.dev, bolt.new, base44.com)"
+          value="base44.com"
+          required
+        >
+        <button type="submit" class="btn btn-primary" id="searchBtn">
+          🔬 Запустити Teardown
+        </button>
+      </form>
+      <div class="quick-chips">
+        <span>Швидкий вибір:</span>
+        <span class="chip" onclick="selectQuick('bolt.new')">bolt.new</span>
+        <span class="chip" onclick="selectQuick('base44.com')">base44.com</span>
+        <span class="chip" onclick="selectQuick('google.com')">google.com</span>
+        <span class="chip" onclick="selectQuick('cloudflare.com')">cloudflare.com</span>
+        <span class="chip" onclick="selectQuick('not-indexed-random-987.io')">not-indexed-domain.io</span>
+      </div>
+    </div>
+
+    <!-- Result Container -->
+    <div id="resultContainer">
+      <!-- Loading Placeholder -->
+      <div id="loadingBox" style="text-align: center; padding: 40px; color: var(--text-muted); display: none;">
+        Опитування FreeSerp Main...
+      </div>
+
+      <!-- Not Found Container -->
+      <div id="notFoundBox" class="not-found-card" style="display: none;">
+        <h3 style="font-size: 18px; margin-bottom: 8px;">ℹ️ Домен не знайдено в індексі FreeSerp Main</h3>
+        <p style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 8px;">
+          Домен <strong id="notFoundDomainName" style="color: #fff;"></strong> відсутній у базі профілів нещодавно активних сайтів (FreeSerp Main).
+        </p>
+        <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.4;">
+          <strong>Чому так відбувається?</strong> FreeSerp Main — це індекс виявлення (discovery pipeline), який сканує та зберігає профілі головних сторінок новостворених або активних доменів. Це <u>не помилка роботи сервера</u>. Якщо домен з'явився нещодавно або ще не проходив зонд liveness probe, він буде проіндексований під час наступного циклу оновлення.
+        </p>
+      </div>
+
+      <!-- Domain Details Box -->
+      <div id="auditContentBox" style="display: none;">
+        <div class="audit-header-card">
+          <div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Результати аудиту для домену:</div>
+            <h2 style="font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 10px;" id="domainHeaderTitle">
+              base44.com
+            </h2>
+            <div style="font-size: 13.5px; color: var(--text-secondary); margin-top: 4px;" id="domainPageTitle">
+              Vibe Coding Platform
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 8px; display: flex; gap: 14px; flex-wrap: wrap;" id="domainMetaTags">
+              <span>вперше зафіксовано живим: <strong id="valWentLive">—</strong></span>
+              <span>Стек: <code id="valAiSource">—</code></span>
+              <span>Сервер: <code id="valWebserver">—</code></span>
+            </div>
+            <div class="source-tag" style="margin-top: 8px;">
+              запит: <code>searchSites({ q: domain, all: 1, size: 1 })</code>
+            </div>
+          </div>
+
+          <div class="audit-score-wrap">
+            <div class="score-badge-circle score-green" id="scoreBadge">85%</div>
+            <div>
+              <div style="font-size: 16px; font-weight: 800; color: var(--text-primary);" id="scoreRatingText">Висока гігієна</div>
+              <div style="font-size: 12px; color: var(--text-muted);" id="scoreRulesPassed">6 із 7 правил пройдено</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rules Section -->
+        <section class="section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <span>📋 Формалізовані правила SEO-гігієни</span>
+            </h3>
+            <div class="source-tag">масив: <code>SEO_HYGIENE_RULES[]</code></div>
+          </div>
+
+          <div class="rules-list" id="rulesList">
+            <!-- Dynamically injected rules -->
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" role="contentinfo"></footer>
+
+  <script type="module">
+    import { searchSites } from './js/api.js';
+    import { renderHeader, renderFooter, formatNumber } from './js/ui.js';
+
+    renderHeader('teardown');
+    renderFooter();
+
+    /**
+     * Formal SEO Hygiene Rules Array with Explanations
+     */
+    const SEO_HYGIENE_RULES = [
+      {
+        id: 'http_status_ok',
+        name: '1. HTTP-доступність (Status 200 OK)',
+        weight: 15,
+        check: (site) => site.http_status === 200,
+        explain: 'Головна сторінка повинна повертати статус HTTP 200 OK без збоїв, безкінечних редиректів або помилок сервера (4xx/5xx).',
+        details: (site) => `Фактичний HTTP статус: ${site.http_status ?? 'невідомо'}`
+      },
+      {
+        id: 'real_site_verified',
+        name: '2. Детекція реального контенту (real_site = 1)',
+        weight: 20,
+        check: (site) => site.real_site === 1,
+        explain: 'Класифікатор FreeSerp повинен підтвердити, що домен має реальний контентний сайт, а не припарковану заглушку чи дорвей.',
+        details: (site) => `Прапорець real_site: ${site.real_site === 1 ? '1 (підтверджено реальний сайт)' : '0 (порожній/припаркований)'}`
+      },
+      {
+        id: 'title_hygiene',
+        name: '3. Гігієна тегу Title (15–80 символів)',
+        weight: 15,
+        check: (site) => site.title && site.title.trim().length >= 15 && site.title.trim().length <= 85,
+        explain: 'Тег <title> — головний маяк для пошукових систем та LLM-краулерів. Занадто короткий заголовок не передає змісту, а довший за 80 символів обрізається в SERP.',
+        details: (site) => site.title 
+          ? `Довжина заголовка: ${site.title.length} симв. («${escapeHtml(site.title)}»)` 
+          : 'Тег Title відсутній або порожній'
+      },
+      {
+        id: 'ai_summary_content',
+        name: '4. Змістовність сторінки для AI (LLM summary)',
+        weight: 15,
+        check: (site) => (site.ai_summary && site.ai_summary.length >= 40) || (site.content_length > 500),
+        explain: 'Наявність змістовного тексту свідчить про те, що пошуковий або AI-агент здатний видобути суть продукту для видачі у відповідях.',
+        details: (site) => site.ai_summary 
+          ? `Довжина AI summary: ${site.ai_summary.length} симв. | Текст: ${formatNumber(site.content_length)} байт` 
+          : 'Смислове резюме не згенеровано краулером'
+      },
+      {
+        id: 'text_html_ratio',
+        name: '5. Співвідношення тексту до HTML-розмітки',
+        weight: 10,
+        check: (site) => {
+          if (!site.html_size || site.html_size === 0) return false;
+          const ratio = (site.content_length || 0) / site.html_size;
+          return ratio >= 0.02 || (site.content_length > 800);
+        },
+        explain: 'Перевантаженість важким HTML/JS-кодом при мінімумі тексту ускладнює рендеринг пошуковим ботам та уповільнює First Contentful Paint.',
+        details: (site) => {
+          const ratio = site.html_size ? (((site.content_length || 0) / site.html_size) * 100).toFixed(1) : 0;
+          return `Текст: ${formatNumber(site.content_length)} B | HTML: ${formatNumber(site.html_size)} B (частка тексту: ${ratio}%)`;
+        }
+      },
+      {
+        id: 'domain_rating_authority',
+        name: '6. Авторитетність домену (Domain Rating > 0)',
+        weight: 15,
+        check: (site) => site.dr !== null && site.dr !== undefined && site.dr > 0,
+        explain: 'Показник DR (0–100) з власного посилального графу FreeSerp. Наявність DR > 0 означає, що на сайт уже ведуть авторитетні зовнішні зворотні посилання.',
+        details: (site) => `Domain Rating (DR): ${site.dr ?? 0} із 100`
+      },
+      {
+        id: 'modern_infrastructure',
+        name: '7. Сучасна інфраструктура доставки (CDN / Cloudflare / Nginx)',
+        weight: 10,
+        check: (site) => {
+          if (!site.webserver) return false;
+          const ws = site.webserver.toLowerCase();
+          return ws.includes('cloudflare') || ws.includes('nginx') || ws.includes('esf') || ws.includes('vercel') || ws.includes('akamai');
+        },
+        explain: 'Використання швидкісних CDN або сучасних Edge-серверів забезпечує мінімальний час відповіді (TTFB) по всьому світу.',
+        details: (site) => `Веб-сервер / CDN: ${site.webserver || 'Заголовок відсутній'}`
+      }
+    ];
+
+    window.selectQuick = function(domain) {
+      document.getElementById('domainInput').value = domain;
+      runTeardown();
+    };
+
+    window.runTeardown = async function() {
+      const rawDomain = document.getElementById('domainInput').value.trim();
+      if (!rawDomain) return;
+
+      // Clean domain from protocol or paths
+      const domain = rawDomain.replace(/^https?:\/\//i, '').replace(/\/.*$/, '').toLowerCase();
+
+      const loadingBox = document.getElementById('loadingBox');
+      const notFoundBox = document.getElementById('notFoundBox');
+      const auditBox = document.getElementById('auditContentBox');
+
+      loadingBox.style.display = 'block';
+      notFoundBox.style.display = 'none';
+      auditBox.style.display = 'none';
+
+      try {
+        const res = await searchSites({
+          q: domain,
+          all: 1,
+          size: 1
+        });
+
+        loadingBox.style.display = 'none';
+
+        // Check exact match
+        const site = res.results?.[0];
+        if (!site || site.domain.toLowerCase() !== domain) {
+          notFoundBox.style.display = 'block';
+          document.getElementById('notFoundDomainName').textContent = domain;
+          return;
+        }
+
+        // Domain Found! Render Teardown
+        auditBox.style.display = 'block';
+        document.getElementById('domainHeaderTitle').innerHTML = `
+          <a href="${escapeHtml(site.url || 'https://' + site.domain)}" target="_blank" rel="noopener">${escapeHtml(site.domain)}</a>
+        `;
+        document.getElementById('domainPageTitle').textContent = site.title || 'Без тегу Title';
+        document.getElementById('valWentLive').textContent = site.went_live || '—';
+        document.getElementById('valAiSource').textContent = site.ai_source || 'not_ai';
+        document.getElementById('valWebserver').textContent = site.webserver || '—';
+
+        // Evaluate Rules
+        let totalScore = 0;
+        let passedCount = 0;
+
+        const evaluatedRules = SEO_HYGIENE_RULES.map(rule => {
+          const isPassed = rule.check(site);
+          if (isPassed) {
+            totalScore += rule.weight;
+            passedCount++;
+          }
+          return {
+            ...rule,
+            passed: isPassed,
+            currentDetails: rule.details(site)
+          };
+        });
+
+        // Score Badge
+        const scoreBadge = document.getElementById('scoreBadge');
+        scoreBadge.textContent = `${totalScore}%`;
+        if (totalScore >= 75) {
+          scoreBadge.className = 'score-badge-circle score-green';
+          document.getElementById('scoreRatingText').textContent = 'Висока гігієна';
+        } else if (totalScore >= 45) {
+          scoreBadge.className = 'score-badge-circle score-amber';
+          document.getElementById('scoreRatingText').textContent = 'Потребує оптимізації';
+        } else {
+          scoreBadge.className = 'score-badge-circle score-red';
+          document.getElementById('scoreRatingText').textContent = 'Критичні прогалини';
+        }
+        document.getElementById('scoreRulesPassed').textContent = `${passedCount} із ${SEO_HYGIENE_RULES.length} правил пройдено`;
+
+        // Render Rules List
+        const rulesListEl = document.getElementById('rulesList');
+        rulesListEl.innerHTML = evaluatedRules.map(r => `
+          <div class="rule-card ${r.passed ? 'rule-passed' : 'rule-failed'}">
+            <div class="rule-top">
+              <span class="rule-name">${escapeHtml(r.name)}</span>
+              <span class="rule-badge ${r.passed ? 'badge-passed' : 'badge-failed'}">
+                ${r.passed ? '✓ ПРОЙДЕНО' : '✕ НЕ ПРОЙДЕНО'} (+${r.passed ? r.weight : 0} / ${r.weight})
+              </span>
+            </div>
+            <div class="rule-explain">${escapeHtml(r.explain)}</div>
+            <div class="rule-details">
+              <strong>Поточне значення:</strong> ${escapeHtml(r.currentDetails)}
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        loadingBox.style.display = 'none';
+        alert('Помилка виконання Teardown: ' + err.message);
+      }
+    };
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Run initial on load
+    runTeardown();
+  </script>
+</body>
+</html>

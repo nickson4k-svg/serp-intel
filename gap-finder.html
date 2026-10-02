@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gap Finder — VibeRadar | Пошук ринкових прогалин</title>
+  <meta name="description" content="Аналіз ринкових можливостей у нішах AI: пошук напрямків із низькою конкуренцією та слабким захистом доменів.">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .filter-panel {
+      background: var(--bg-card);
+      backdrop-filter: var(--backdrop-blur);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .filter-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .opportunity-card {
+      background: linear-gradient(135deg, rgba(2, 132, 199, 0.15), rgba(16, 185, 129, 0.1));
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .score-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 3px solid var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--text-accent);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header" role="banner"></header>
+
+  <main class="container" role="main">
+    <section class="page-hero">
+      <div class="page-hero-title">
+        <h1>Gap Finder: Аналіз ринкових прогалин</h1>
+        <span class="live-indicator">
+          <span class="live-dot"></span>
+          Аналітика можливостей
+        </span>
+      </div>
+      <p class="page-hero-subtitle">
+        Інструмент пошуку «блакитних океанів» серед AI-продуктів: виявлення ніш із високою активністю, 
+        але слабким рівнем авторитетності конкурентів (DR &le; 10) або слабкою присутністю основних білдерів.
+      </p>
+    </section>
+
+    <!-- Filters -->
+    <div class="filter-panel">
+      <div class="filter-group">
+        <label class="filter-label" for="nicheSelect">Оберіть нішу (ai_categories):</label>
+        <select id="nicheSelect" class="form-control">
+          <option value="AI Automation & Workflows">AI Automation & Workflows</option>
+          <option value="AI Agents & Autonomous" selected>AI Agents & Autonomous</option>
+          <option value="Code & Dev Tools">Code & Dev Tools</option>
+          <option value="Marketing & Ads">Marketing & Ads</option>
+          <option value="Productivity">Productivity</option>
+          <option value="Design & UI">Design & UI</option>
+          <option value="AI Website Builder">AI Website Builder</option>
+          <option value="No-code / App Builder">No-code / App Builder</option>
+          <option value="AI Chatbot & Assistant">AI Chatbot & Assistant</option>
+          <option value="Image Generation">Image Generation</option>
+          <option value="Writing & Content">Writing & Content</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label" for="drMaxSelect">Максимальний DR конкурентів:</label>
+        <select id="drMaxSelect" class="form-control">
+          <option value="10" selected>DR &le; 10 (Слабкі сайти / Легкий вхід)</option>
+          <option value="25">DR &le; 25 (Середня конкуренція)</option>
+          <option value="100">Будь-який DR (Всі сайти)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label" for="aiSourceSelect">Стек / Білдер:</label>
+        <select id="aiSourceSelect" class="form-control">
+          <option value="" selected>Всі платформи</option>
+          <option value="lovable">Тільки Lovable</option>
+          <option value="v0">Тільки v0</option>
+          <option value="bolt">Тільки Bolt</option>
+          <option value="base44">Тільки Base44</option>
+        </select>
+      </div>
+
+      <div>
+        <button id="applyFiltersBtn" class="btn btn-primary" style="width: 100%;">
+          🔍 Знайти прогалини
+        </button>
+      </div>
+    </div>
+
+    <!-- Opportunity Summary Card -->
+    <div class="opportunity-card" id="opportunityCard">
+      <div>
+        <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;" id="oppNicheTitle">AI Agents & Autonomous</h2>
+        <p style="font-size: 13.5px; color: var(--text-secondary); max-width: 600px;" id="oppDesc">
+          Оцінка ринкової прогалини розраховується на основі частки сайтів із нульовим або низьким DR (слабка SEO-оборона) 
+          та ступеня проникнення AI-білдерів.
+        </p>
+        <div style="display: flex; gap: 16px; margin-top: 12px; font-size: 12px;" id="oppMetrics">
+          <span>Всього в ніші: <strong id="oppTotalSites">—</strong></span>
+          <span>Із слабким DR: <strong id="oppLowDrSites">—</strong></span>
+          <span>Частка уразливих: <strong id="oppVulnerableRatio">—</strong></span>
+        </div>
+      </div>
+      <div style="text-align: center;">
+        <div class="score-circle" id="oppScoreVal">78</div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-top: 6px;">Opportunity Score</div>
+      </div>
+    </div>
+
+    <!-- Sites Table -->
+    <section class="section" aria-labelledby="sites-list-heading">
+      <div class="section-header">
+        <h2 id="sites-list-heading" class="section-title">
+          <span>🌐 Сайти конкурентів у вибраному сегменті</span>
+        </h2>
+        <span class="source-tag" id="querySourceTag">
+          запит: <code>searchSites(...)</code>
+        </span>
+      </div>
+
+      <div class="card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 30%;">Домен / Проєкт</th>
+                <th style="width: 12%; text-align: center;">Domain Rating</th>
+                <th style="width: 18%;">Стек (ai_source)</th>
+                <th style="width: 20%;">Вперше зафіксовано живим</th>
+                <th style="width: 20%;">Категорії</th>
+              </tr>
+            </thead>
+            <tbody id="gapSitesTableBody">
+              <tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Завантаження списку проєктів...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo"></footer>
+
+  <script type="module">
+    import { countBy, searchSites } from './js/api.js';
+    import { renderHeader, renderFooter, formatNumber, formatPercent } from './js/ui.js';
+
+    renderHeader('gap-finder');
+    renderFooter();
+
+    async function analyzeGap() {
+      const niche = document.getElementById('nicheSelect').value;
+      const drMax = parseInt(document.getElementById('drMaxSelect').value, 10);
+      const aiSource = document.getElementById('aiSourceSelect').value;
+
+      document.getElementById('oppNicheTitle').textContent = niche;
+      document.getElementById('oppScoreVal').textContent = '...';
+      document.getElementById('gapSitesTableBody').innerHTML = 
+        '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Опитування індексу FreeSerp...</td></tr>';
+
+      try {
+        // 1. Total in niche
+        const baseFilters = { ai_categories: niche };
+        if (aiSource) baseFilters.ai_source = aiSource;
+        const totalRes = await countBy(baseFilters);
+        const total = totalRes.total;
+
+        // 2. Sites with DR <= drMax
+        const lowDrFilters = { ...baseFilters, dr_max: drMax };
+        const lowDrRes = await countBy(lowDrFilters);
+        const lowDr = lowDrRes.total;
+
+        const ratio = total > 0 ? (lowDr / total) * 100 : 0;
+        const oppScore = Math.min(99, Math.round(ratio * 0.9 + 10));
+
+        document.getElementById('oppTotalSites').textContent = formatNumber(total);
+        document.getElementById('oppLowDrSites').textContent = formatNumber(lowDr);
+        document.getElementById('oppVulnerableRatio').textContent = formatPercent(ratio);
+        document.getElementById('oppScoreVal').textContent = oppScore;
+
+        // 3. Search actual sites
+        const searchFilters = {
+          ...lowDrFilters,
+          sort: 'dr',
+          order: 'asc',
+          size: 15
+        };
+
+        document.getElementById('querySourceTag').innerHTML = 
+          `запит: <code>searchSites({ ai_categories: '${niche}', dr_max: ${drMax}${aiSource ? `, ai_source: '${aiSource}'` : ''} })</code>`;
+
+        const sitesRes = await searchSites(searchFilters);
+        const tbody = document.getElementById('gapSitesTableBody');
+
+        if (!sitesRes.results || sitesRes.results.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Сайтів за цими критеріями не знайдено.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = sitesRes.results.map(s => `
+          <tr>
+            <td>
+              <div>
+                <strong><a href="${escapeHtml(s.url || 'https://' + s.domain)}" target="_blank" rel="noopener">${escapeHtml(s.domain)}</a></strong>
+              </div>
+              <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                ${escapeHtml(s.title || 'Без заголовка')}
+              </div>
+            </td>
+            <td style="text-align: center;">
+              <span class="metric-badge" style="font-weight: 700; ${s.dr === 0 ? 'background: rgba(239, 68, 68, 0.15); color: var(--color-danger);' : 'background: rgba(16, 185, 129, 0.15); color: var(--color-success);'}">
+                DR ${s.dr ?? 0}
+              </span>
+            </td>
+            <td>
+              <code>${escapeHtml(s.ai_source || 'not_ai')}</code>
+            </td>
+            <td style="font-size: 12.5px;">
+              <span>вперше зафіксовано живим: <strong>${s.went_live || '—'}</strong></span>
+            </td>
+            <td style="font-size: 11.5px; color: var(--text-muted);">
+              ${s.ai_categories ? s.ai_categories.join(', ') : '—'}
+            </td>
+          </tr>
+        `).join('');
+
+      } catch (err) {
+        console.error('Gap analysis error:', err);
+        document.getElementById('gapSitesTableBody').innerHTML = 
+          `<tr><td colspan="5" class="alert alert-danger">Помилка аналізу: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    document.getElementById('applyFiltersBtn').addEventListener('click', analyzeGap);
+    analyzeGap();
+  </script>
+</body>
+</html>

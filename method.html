@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Method — VibeRadar | Методологія, джерела та термінологія</title>
+  <meta name="description" content="Опис методології збору даних, значень полів індексу FreeSerp, визначення went_live та архітектури VibeRadar.">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .doc-content-wrap {
+      background: var(--bg-card);
+      backdrop-filter: var(--backdrop-blur);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+    .doc-content-wrap h2 {
+      font-size: 20px;
+      margin: 24px 0 10px;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 6px;
+    }
+    .doc-content-wrap h2:first-child {
+      margin-top: 0;
+    }
+    .doc-content-wrap p {
+      margin-bottom: 14px;
+      color: var(--text-secondary);
+      font-size: 14.5px;
+    }
+    .doc-content-wrap ul {
+      margin-left: 20px;
+      margin-bottom: 14px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .doc-content-wrap li {
+      margin-bottom: 6px;
+    }
+    .callout {
+      background: rgba(56, 189, 248, 0.1);
+      border-left: 4px solid var(--text-accent);
+      padding: 14px 18px;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      margin: 18px 0;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header" role="banner"></header>
+
+  <main class="container" role="main">
+    <section class="page-hero">
+      <div class="page-hero-title">
+        <h1>Method: Методологія та визначення</h1>
+      </div>
+      <p class="page-hero-subtitle">
+        Прозорі стандарти обробки даних, обмеження відкритих API, термінологія та архітектурні принципи VibeRadar.
+      </p>
+    </section>
+
+    <article class="doc-content-wrap">
+      <h2>1. Джерело даних: FreeSerp Main</h2>
+      <p>
+        Усі дані в додатку VibeRadar отримуються в режимі реального часу з публічного безключового API сервісу 
+        <a href="https://freeserp.ai" target="_blank" rel="noopener">FreeSerp</a> (кінцева точка <code>https://freeserp.ai/api.php</code>, 
+        індекс за замовчуванням: <code>index=sites</code>).
+      </p>
+      <p>
+        FreeSerp Main містить понад 20 мільйонів профілів головних сторінок активних вебсайтів. Для кожного домену генерується LLM-підсумок (<code>ai_summary</code>), 
+        розраховується Domain Rating (<code>dr</code>), класифікується стек розробки (<code>ai_source</code>) та фіксується дата першої виявленої доступності (<code>went_live</code>).
+      </p>
+
+      <h2>2. Важливе застереження щодо поля went_live</h2>
+      <div class="callout">
+        <strong>⚠️ went_live — це НЕ офіційна дата запуску продукту!</strong><br>
+        Поле <code>went_live</code> означає дату, коли автоматизований зонд перевірки доступності (liveness probe) FreeSerp 
+        <strong>вперше зафіксував сайт у робочому стані</strong> (HTTP 200). Домен міг бути зареєстрований значно раніше або офіційно представлений пізніше. 
+        У всіх інтерфейсах VibeRadar це значення позначається як <em>«вперше зафіксовано живим»</em>.
+      </div>
+
+      <h2>3. Що означає Domain Rating (DR)?</h2>
+      <p>
+        <strong>Domain Rating (0–100)</strong> — логарифмічна шкала авторитетності домену, розрахована за внутрішнім веб-графом FreeSerp 
+        із калібруванням за шкалою Ahrefs. DR відображає силу та якість профілю зворотних посилань (backlinks).
+      </p>
+      <ul>
+        <li><strong>DR 0</strong>: Новий або непроіндексований іншими сайтами ресурс, типовий для свіжих прототипів.</li>
+        <li><strong>DR 1–25</strong>: Молодий сайт із першими зовнішніми згадками.</li>
+        <li><strong>DR 25–50</strong>: Сформований ресурс із солідною посилальною базою.</li>
+        <li><strong>DR 50+</strong>: Домени з найвищим трастом (відомі медіа, платформи, офіційні сайти білдерів).</li>
+      </ul>
+
+      <h2>4. Детекція білдерів (ai_source) та фільтр ai_startups=1</h2>
+      <p>
+        Поле <code>ai_source</code> містить розпізнані сліди технологічного стеку або платформи генерації:
+        <code>lovable</code>, <code>v0</code>, <code>bolt</code>, <code>base44</code>, <code>nextjs</code>, <code>wordpress</code> тощо.
+      </p>
+      <p>
+        Оскільки білдерами користуються не лише продуктові стартапи, але й агрегатори та сайти-афіліати, прапорець 
+        <code>ai_startups=1</code> відсікає нецільовий шум і залишає виключно інноваційні продуктові AI-сервіси.
+      </p>
+
+      <h2>5. Архітектура клієнта та безпека запитів</h2>
+      <p>
+        Відповідно до правил проєкту:
+      </p>
+      <ul>
+        <li><strong>Черга запитів</strong>: Частота звернень обмежена &le; 3 запитами на секунду (пауза 350 мс між викликами).</li>
+        <li><strong>Кешування</strong>: Відповіді зберігаються у <code>sessionStorage</code> під час активної сесії, уникаючи повторного навантаження на сервери API.</li>
+        <li><strong>Таймаут</strong>: 10 секунд на запит через <code>AbortController</code>.</li>
+        <li><strong>Повтори при 502</strong>: До 2 автоматичних повторів з експоненційною затримкою у разі помилки віддаленого пошукового рушія.</li>
+        <li><strong>Ідентифікація</strong>: Усі запити підписуються параметрами <code>agent=VibeRadar/1.0</code> та <code>project=VibeRadar</code>.</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer class="site-footer" role="contentinfo"></footer>
+
+  <script type="module">
+    import { renderHeader, renderFooter } from './js/ui.js';
+    renderHeader('method');
+    renderFooter();
+  </script>
+</body>
+</html>
