@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "VibeRadar — AI Website Ecosystem Analytics on FreeSerp API",
   "scripts": {
-    "dev": "node server.js",
+    "dev": "node dev-server.js",
     "test": "node tests.html"
   },
   "keywords": ["freeserp", "ai-startups", "analytics", "serp"],
