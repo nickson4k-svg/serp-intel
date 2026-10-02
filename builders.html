@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Builders — VibeRadar | Порівняння AI-білдерів</title>
+  <meta name="description" content="Порівняння сайтів, створених на Lovable, v0, Bolt та Base44: кількість проєктів, авторитетність DR та домінуючі ніші.">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .builders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .builder-card {
+      background: var(--bg-card);
+      backdrop-filter: var(--backdrop-blur);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all var(--transition-normal);
+    }
+    .builder-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-medium);
+    }
+    .builder-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .builder-title {
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .builder-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      color: #fff;
+    }
+    .logo-lovable { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+    .logo-v0 { background: linear-gradient(135deg, #000000, #334155); border: 1px solid #475569; }
+    .logo-bolt { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    .logo-base44 { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+
+    .builder-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex-grow: 1;
+    }
+    .stat-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .stat-row-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .stat-row-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-primary);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .stat-row-sub {
+      font-size: 13px;
+      font-weight: normal;
+      color: var(--text-muted);
+    }
+    .niche-tag-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .niche-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card-hover);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+    }
+    .niche-item-name {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .niche-item-count {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--text-accent);
+    }
+    .builder-card-error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: var(--color-danger);
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+    .card-footer-actions {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-fast);
+    }
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg);
+      max-width: 680px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header" role="banner"></header>
+
+  <main class="container" role="main">
+    <section class="page-hero">
+      <div class="page-hero-title">
+        <h1>Builders: Битва AI-білдерів</h1>
+        <span class="live-indicator">
+          <span class="live-dot"></span>
+          Запити через countBy
+        </span>
+      </div>
+      <p class="page-hero-subtitle">
+        Порівняння чотирьох ключових AI-платформ розробки вебсайтів: 
+        <strong>Lovable</strong>, <strong>v0 (Vercel)</strong>, <strong>Bolt.new</strong> та <strong>Base44</strong>. 
+        Показники завантажуються поступово в реальному часі.
+      </p>
+    </section>
+
+    <!-- Global Progress Bar for requests -->
+    <div id="loadingProgressWrap" style="margin-bottom: 20px;">
+      <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">
+        <span id="progressStatusText">Асинхронне опитування індексу FreeSerp...</span>
+        <span id="progressPercent">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div id="progressFill" class="progress-bar-fill" style="width: 5%;"></div>
+      </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="builders-grid" id="buildersGrid">
+      <!-- 1. Lovable -->
+      <article class="builder-card" id="card-lovable">
+        <div class="builder-header">
+          <div class="builder-title">
+            <div class="builder-logo logo-lovable">L</div>
+            <span>Lovable</span>
+          </div>
+          <span class="metric-badge">ai_source=lovable</span>
+        </div>
+
+        <div class="builder-card-error" id="err-lovable" style="display: none;"></div>
+
+        <div class="builder-stats">
+          <div class="stat-row">
+            <span class="stat-row-label">Всього сайтів у індексі</span>
+            <div class="stat-row-val" id="total-lovable">
+              <span class="skeleton" style="width: 90px; height: 28px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'lovable' })</code></div>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-row-label">Частка сайтів з DR &ge; 1</span>
+            <div class="stat-row-val" id="dr-lovable">
+              <span class="skeleton" style="width: 120px; height: 28px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'lovable', dr_min: 1 })</code></div>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-row-label">Топ-3 ніші білдера</span>
+            <div class="niche-tag-list" id="niches-lovable">
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'lovable', ai_categories })</code></div>
+          </div>
+        </div>
+
+        <div class="card-footer-actions">
+          <button class="btn btn-secondary" style="width: 100%; font-size: 12.5px;" onclick="showTopSites('lovable', 'Lovable')">
+            🔍 Переглянути топ-5 за DR
+          </button>
+        </div>
+      </article>
+
+      <!-- 2. v0 -->
+      <article class="builder-card" id="card-v0">
+        <div class="builder-header">
+          <div class="builder-title">
+            <div class="builder-logo logo-v0">v0</div>
+            <span>v0 (Vercel)</span>
+          </div>
+          <span class="metric-badge">ai_source=v0</span>
+        </div>
+
+        <div class="builder-card-error" id="err-v0" style="display: none;"></div>
+
+        <div class="builder-stats">
+          <div class="stat-row">
+            <span class="stat-row-label">Всього сайтів у індексі</span>
+            <div class="stat-row-val" id="total-v0">
+              <span class="skeleton" style="width: 90px; height: 28px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'v0' })</code></div>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-row-label">Частка сайтів з DR &ge; 1</span>
+            <div class="stat-row-val" id="dr-v0">
+              <span class="skeleton" style="width: 120px; height: 28px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'v0', dr_min: 1 })</code></div>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-row-label">Топ-3 ніші білдера</span>
+            <div class="niche-tag-list" id="niches-v0">
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'v0', ai_categories })</code></div>
+          </div>
+        </div>
+
+        <div class="card-footer-actions">
+          <button class="btn btn-secondary" style="width: 100%; font-size: 12.5px;" onclick="showTopSites('v0', 'v0 by Vercel')">
+            🔍 Переглянути топ-5 за DR
+          </button>
+        </div>
+      </article>
+
+      <!-- 3. Bolt -->
+      <article class="builder-card" id="card-bolt">
+        <div class="builder-header">
+          <div class="builder-title">
+            <div class="builder-logo logo-bolt">⚡</div>
+            <span>Bolt.new</span>
+          </div>
+          <span class="metric-badge">ai_source=bolt</span>
+        </div>
+
+        <div class="builder-card-error" id="err-bolt" style="display: none;"></div>
+
+        <div class="builder-stats">
+          <div class="stat-row">
+            <span class="stat-row-label">Всього сайтів у індексі</span>
+            <div class="stat-row-val" id="total-bolt">
+              <span class="skeleton" style="width: 90px; height: 28px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'bolt' })</code></div>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-row-label">Частка сайтів з DR &ge; 1</span>
+            <div class="stat-row-val" id="dr-bolt">
+              <span class="skeleton" style="width: 120px; height: 28px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'bolt', dr_min: 1 })</code></div>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-row-label">Топ-3 ніші білдера</span>
+            <div class="niche-tag-list" id="niches-bolt">
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'bolt', ai_categories })</code></div>
+          </div>
+        </div>
+
+        <div class="card-footer-actions">
+          <button class="btn btn-secondary" style="width: 100%; font-size: 12.5px;" onclick="showTopSites('bolt', 'Bolt.new')">
+            🔍 Переглянути топ-5 за DR
+          </button>
+        </div>
+      </article>
+
+      <!-- 4. Base44 -->
+      <article class="builder-card" id="card-base44">
+        <div class="builder-header">
+          <div class="builder-title">
+            <div class="builder-logo logo-base44">44</div>
+            <span>Base44</span>
+          </div>
+          <span class="metric-badge">ai_source=base44</span>
+        </div>
+
+        <div class="builder-card-error" id="err-base44" style="display: none;"></div>
+
+        <div class="builder-stats">
+          <div class="stat-row">
+            <span class="stat-row-label">Всього сайтів у індексі</span>
+            <div class="stat-row-val" id="total-base44">
+              <span class="skeleton" style="width: 90px; height: 28px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'base44' })</code></div>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-row-label">Частка сайтів з DR &ge; 1</span>
+            <div class="stat-row-val" id="dr-base44">
+              <span class="skeleton" style="width: 120px; height: 28px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'base44', dr_min: 1 })</code></div>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-row-label">Топ-3 ніші білдера</span>
+            <div class="niche-tag-list" id="niches-base44">
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+              <span class="skeleton" style="width: 100%; height: 26px;"></span>
+            </div>
+            <div class="source-tag">запит: <code>countBy({ ai_source: 'base44', ai_categories })</code></div>
+          </div>
+        </div>
+
+        <div class="card-footer-actions">
+          <button class="btn btn-secondary" style="width: 100%; font-size: 12.5px;" onclick="showTopSites('base44', 'Base44')">
+            🔍 Переглянути топ-5 за DR
+          </button>
+        </div>
+      </article>
+    </div>
+
+    <!-- Comparative Table Summary -->
+    <section class="section" aria-labelledby="summary-heading">
+      <div class="section-header">
+        <h2 id="summary-heading" class="section-title">
+          <span>📋 Зведена порівняльна таблиця</span>
+        </h2>
+        <div class="source-tag">джерело: агрегація запитів <code>countBy</code></div>
+      </div>
+
+      <div class="card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Платформа (ai_source)</th>
+                <th style="text-align: right;">Всього сайтів</th>
+                <th style="text-align: right;">Сайти з DR &ge; 1</th>
+                <th style="text-align: right;">Частка з DR &ge; 1</th>
+                <th>Головна ніша</th>
+              </tr>
+            </thead>
+            <tbody id="summaryTableBody">
+              <tr>
+                <td><strong>Lovable</strong> (<code>lovable</code>)</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-lovable">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-lovable">—</td>
+                <td style="text-align: right; font-weight: 700;" id="sum-ratio-lovable">—</td>
+                <td id="sum-niche-lovable">—</td>
+              </tr>
+              <tr>
+                <td><strong>v0 by Vercel</strong> (<code>v0</code>)</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-v0">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-v0">—</td>
+                <td style="text-align: right; font-weight: 700;" id="sum-ratio-v0">—</td>
+                <td id="sum-niche-v0">—</td>
+              </tr>
+              <tr>
+                <td><strong>Bolt.new</strong> (<code>bolt</code>)</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-bolt">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-bolt">—</td>
+                <td style="text-align: right; font-weight: 700;" id="sum-ratio-bolt">—</td>
+                <td id="sum-niche-bolt">—</td>
+              </tr>
+              <tr>
+                <td><strong>Base44</strong> (<code>base44</code>)</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-total-base44">—</td>
+                <td style="text-align: right; font-family: var(--font-mono);" id="sum-dr-base44">—</td>
+                <td style="text-align: right; font-weight: 700;" id="sum-ratio-base44">—</td>
+                <td id="sum-niche-base44">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal for Top 5 Sites -->
+  <div class="modal-backdrop" id="sitesModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="font-size: 17px; font-weight: 700;">Топ-сайти</h3>
+        <button id="closeModalBtn" class="btn btn-secondary" style="padding: 4px 10px; font-size: 13px;">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        Завантаження...
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer" role="contentinfo"></footer>
+
+  <script type="module">
+    import { countBy, searchSites } from './js/api.js';
+    import { renderHeader, renderFooter, formatNumber, formatPercent } from './js/ui.js';
+
+    renderHeader('builders');
+    renderFooter();
+
+    const builders = [
+      {
+        id: 'lovable',
+        name: 'Lovable',
+        candidateNiches: ['AI Automation & Workflows', 'AI Agents & Autonomous', 'Marketing & Ads', 'Code & Dev Tools', 'Productivity']
+      },
+      {
+        id: 'v0',
+        name: 'v0 (Vercel)',
+        candidateNiches: ['AI Agents & Autonomous', 'AI Automation & Workflows', 'Code & Dev Tools', 'AI Infrastructure & API', 'Design & UI']
+      },
+      {
+        id: 'bolt',
+        name: 'Bolt.new',
+        candidateNiches: ['Code & Dev Tools', 'AI Automation & Workflows', 'AI Agents & Autonomous', 'AI Website Builder', 'Design & UI']
+      },
+      {
+        id: 'base44',
+        name: 'Base44',
+        candidateNiches: ['AI Agents & Autonomous', 'AI Automation & Workflows', 'Code & Dev Tools', 'AI Chatbot & Assistant', 'No-code / App Builder']
+      }
+    ];
+
+    let completedSteps = 0;
+    const totalSteps = builders.length * 3; // total + dr + niches for each
+
+    function updateProgress(stepText) {
+      completedSteps++;
+      const pct = Math.min(100, Math.round((completedSteps / totalSteps) * 100));
+      document.getElementById('progressFill').style.width = `${pct}%`;
+      document.getElementById('progressPercent').textContent = `${pct}%`;
+      document.getElementById('progressStatusText').textContent = stepText || 'Опитування індексу...';
+      if (pct >= 100) {
+        setTimeout(() => {
+          document.getElementById('loadingProgressWrap').style.display = 'none';
+        }, 800);
+      }
+    }
+
+    async function loadBuilderData(b) {
+      const errBox = document.getElementById(`err-${b.id}`);
+      let totalCount = 0;
+      let drCount = 0;
+
+      // 1. Total sites
+      try {
+        const res = await countBy({ ai_source: b.id });
+        totalCount = res.total;
+        document.getElementById(`total-${b.id}`).textContent = formatNumber(totalCount);
+        document.getElementById(`sum-total-${b.id}`).textContent = formatNumber(totalCount);
+        updateProgress(`Завантажено total для ${b.name}`);
+      } catch (err) {
+        console.error(`Error loading total for ${b.id}:`, err);
+        errBox.style.display = 'block';
+        errBox.textContent = `Помилка отримання total: ${err.message}`;
+        document.getElementById(`total-${b.id}`).textContent = 'Помилка';
+        updateProgress(`Помилка total для ${b.name}`);
+      }
+
+      // 2. dr_min=1 sites and ratio
+      try {
+        const resDr = await countBy({ ai_source: b.id, dr_min: 1 });
+        drCount = resDr.total;
+        const ratio = totalCount > 0 ? (drCount / totalCount) * 100 : 0;
+        
+        document.getElementById(`dr-${b.id}`).innerHTML = `
+          <span>${formatPercent(ratio)}</span>
+          <span class="stat-row-sub">(${formatNumber(drCount)} сайтів)</span>
+        `;
+        document.getElementById(`sum-dr-${b.id}`).textContent = formatNumber(drCount);
+        document.getElementById(`sum-ratio-${b.id}`).textContent = formatPercent(ratio);
+        updateProgress(`Завантажено DR для ${b.name}`);
+      } catch (err) {
+        console.error(`Error loading DR for ${b.id}:`, err);
+        errBox.style.display = 'block';
+        errBox.textContent = `Помилка отримання DR: ${err.message}`;
+        document.getElementById(`dr-${b.id}`).textContent = 'Помилка';
+        updateProgress(`Помилка DR для ${b.name}`);
+      }
+
+      // 3. Top niches via countBy
+      try {
+        const nicheCounts = [];
+        for (const cat of b.candidateNiches) {
+          const catRes = await countBy({ ai_source: b.id, ai_categories: cat });
+          if (catRes.total > 0) {
+            nicheCounts.push({ category: cat, total: catRes.total });
+          }
+        }
+        nicheCounts.sort((x, y) => y.total - x.total);
+        const top3 = nicheCounts.slice(0, 3);
+
+        const listEl = document.getElementById(`niches-${b.id}`);
+        if (top3.length > 0) {
+          listEl.innerHTML = top3.map(n => `
+            <div class="niche-item">
+              <span class="niche-item-name">${escapeHtml(n.category)}</span>
+              <span class="niche-item-count">${formatNumber(n.total)}</span>
+            </div>
+          `).join('');
+          document.getElementById(`sum-niche-${b.id}`).textContent = top3[0].category;
+        } else {
+          listEl.innerHTML = '<span style="color: var(--text-muted); font-size: 12px;">Ніш не виявлено</span>';
+          document.getElementById(`sum-niche-${b.id}`).textContent = '—';
+        }
+        updateProgress(`Завантажено ніші для ${b.name}`);
+      } catch (err) {
+        console.error(`Error loading niches for ${b.id}:`, err);
+        errBox.style.display = 'block';
+        errBox.textContent = `Помилка отримання ніш: ${err.message}`;
+        document.getElementById(`niches-${b.id}`).innerHTML = '<span style="color: var(--color-danger); font-size: 12px;">Помилка запиту</span>';
+        updateProgress(`Помилка ніш для ${b.name}`);
+      }
+    }
+
+    async function loadAllBuilders() {
+      for (const b of builders) {
+        // Sequential to respect rate limit gracefully
+        await loadBuilderData(b);
+      }
+    }
+
+    // Modal logic for top sites
+    window.showTopSites = async function(builderId, builderName) {
+      const modal = document.getElementById('sitesModal');
+      const title = document.getElementById('modalTitle');
+      const body = document.getElementById('modalBody');
+
+      title.textContent = `Топ-5 сайтів за авторитетністю: ${builderName}`;
+      body.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted);">Опитування API (sort=dr)...</div>';
+      modal.classList.add('open');
+
+      try {
+        const res = await searchSites({
+          ai_source: builderId,
+          sort: 'dr',
+          order: 'desc',
+          size: 5
+        });
+
+        if (!res.results || res.results.length === 0) {
+          body.innerHTML = '<p style="color: var(--text-muted);">Сайтів не знайдено.</p>';
+          return;
+        }
+
+        body.innerHTML = `
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+            запит: <code>searchSites({ ai_source: '${builderId}', sort: 'dr', order: 'desc', size: 5 })</code>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            ${res.results.map((site, i) => `
+              <div style="background: var(--bg-card-hover); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                  <strong style="font-size: 15px;">
+                    ${i + 1}. <a href="${escapeHtml(site.url || 'https://' + site.domain)}" target="_blank" rel="noopener">${escapeHtml(site.domain)}</a>
+                  </strong>
+                  <span class="metric-badge" style="background: rgba(16, 185, 129, 0.2); color: var(--color-success); font-weight: 700;">
+                    DR ${site.dr ?? '0'}
+                  </span>
+                </div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">
+                  ${escapeHtml(site.title || 'Без назви')}
+                </div>
+                ${site.ai_summary ? `
+                  <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 6px;">
+                    ${escapeHtml(site.ai_summary)}
+                  </div>
+                ` : ''}
+                <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 12px; flex-wrap: wrap;">
+                  <span>Вперше зафіксовано живим: <strong>${site.went_live || '—'}</strong></span>
+                  ${site.ai_categories ? `<span>Категорії: <em>${site.ai_categories.join(', ')}</em></span>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } catch (err) {
+        body.innerHTML = `<div class="alert alert-danger">Помилка завантаження сайтів: ${escapeHtml(err.message)}</div>`;
+      }
+    };
+
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+      document.getElementById('sitesModal').classList.remove('open');
+    });
+
+    document.getElementById('sitesModal').addEventListener('click', (e) => {
+      if (e.target.id === 'sitesModal') {
+        document.getElementById('sitesModal').classList.remove('open');
+      }
+    });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    loadAllBuilders();
+  </script>
+</body>
+</html>
