@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VibeRadar API Layer Tests</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #334155;
+      --accent: #38bdf8;
+      --success: #4ade80;
+      --error: #f87171;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+      line-height: 1.5;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge {
+      background: #0284c7;
+      color: #fff;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 9999px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .status {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .status.pending { background: #ca8a04; color: #fff; }
+    .status.pass { background: #16a34a; color: #fff; }
+    .status.fail { background: #dc2626; color: #fff; }
+    pre {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #e2e8f0;
+      overflow-x: auto;
+      max-height: 220px;
+    }
+    .meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      word-break: break-all;
+    }
+    button {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <h1>
+    VibeRadar API Data Layer Tests
+    <span class="badge">Live API Verification</span>
+  </h1>
+  <p style="color: var(--muted); font-size: 14px;">
+    Перевірка модуля <code>js/api.js</code>: черга запитів, кеш у <code>sessionStorage</code>, 
+    параметри <code>agent</code> та <code>project</code>, повтори та методи <code>getStats()</code>, 
+    <code>countBy()</code>, <code>searchSites()</code>.
+  </p>
+  <button id="runTestsBtn">Запустити тести повторно</button>
+
+  <div class="grid">
+    <!-- Test 1: getStats -->
+    <div class="card" id="test-stats">
+      <div class="card-title">
+        <span>1. getStats()</span>
+        <span class="status pending">Виконується...</span>
+      </div>
+      <div class="meta" id="meta-stats">Запит надсилається...</div>
+      <pre id="code-stats">Очікування відповіді...</pre>
+    </div>
+
+    <!-- Test 2: countBy -->
+    <div class="card" id="test-count">
+      <div class="card-title">
+        <span>2. countBy({ ai_source: 'lovable' })</span>
+        <span class="status pending">Виконується...</span>
+      </div>
+      <div class="meta" id="meta-count">Запит надсилається...</div>
+      <pre id="code-count">Очікування відповіді...</pre>
+    </div>
+
+    <!-- Test 3: countBy with dr_min -->
+    <div class="card" id="test-dr">
+      <div class="card-title">
+        <span>3. countBy({ ai_source: 'lovable', dr_min: 1 })</span>
+        <span class="status pending">Виконується...</span>
+      </div>
+      <div class="meta" id="meta-dr">Запит надсилається...</div>
+      <pre id="code-dr">Очікування відповіді...</pre>
+    </div>
+
+    <!-- Test 4: searchSites -->
+    <div class="card" id="test-search">
+      <div class="card-title">
+        <span>4. searchSites({ ai_source: 'v0', size: 3 })</span>
+        <span class="status pending">Виконується...</span>
+      </div>
+      <div class="meta" id="meta-search">Запит надсилається...</div>
+      <pre id="code-search">Очікування відповіді...</pre>
+    </div>
+
+    <!-- Test 5: Cache Verification -->
+    <div class="card" id="test-cache">
+      <div class="card-title">
+        <span>5. Перевірка кешу (повторний getStats)</span>
+        <span class="status pending">Очікування...</span>
+      </div>
+      <div class="meta" id="meta-cache">Очікування завершення тесту 1...</div>
+      <pre id="code-cache">Очікування...</pre>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getStats, countBy, searchSites } from './js/api.js';
+
+    function setStatus(cardId, isPass, text) {
+      const card = document.getElementById(cardId);
+      const badge = card.querySelector('.status');
+      badge.className = `status ${isPass ? 'pass' : 'fail'}`;
+      badge.textContent = text || (isPass ? 'PASS' : 'FAIL');
+    }
+
+    async function runAllTests() {
+      console.log('Початок виконання тестів VibeRadar API...');
+
+      // 1. getStats
+      const t1Start = performance.now();
+      try {
+        const stats = await getStats();
+        const duration = Math.round(performance.now() - t1Start);
+        const pass = stats && stats.totals && typeof stats.totals.real_sites === 'number';
+        setStatus('test-stats', pass);
+        document.getElementById('meta-stats').textContent = 
+          `Тривалість: ${duration}мс | Cached: ${stats._cached} | URL: ${stats._sourceUrl}`;
+        document.getElementById('code-stats').textContent = JSON.stringify({
+          ok: stats.ok,
+          generated_at: stats.generated_at,
+          totals: stats.totals,
+          new: stats.new,
+          ai_startups: stats.ai_startups,
+          sample_by_day: stats.by_day?.slice(0, 3)
+        }, null, 2);
+      } catch (e) {
+        setStatus('test-stats', false);
+        document.getElementById('meta-stats').textContent = `Помилка: ${e.message}`;
+        document.getElementById('code-stats').textContent = e.stack;
+      }
+
+      // 2. countBy
+      const t2Start = performance.now();
+      try {
+        const countRes = await countBy({ ai_source: 'lovable' });
+        const duration = Math.round(performance.now() - t2Start);
+        const pass = countRes && typeof countRes.total === 'number' && countRes.total > 0;
+        setStatus('test-count', pass);
+        document.getElementById('meta-count').textContent = 
+          `Тривалість: ${duration}мс | Cached: ${countRes._cached} | Total: ${countRes.total} | URL: ${countRes._sourceUrl}`;
+        document.getElementById('code-count').textContent = JSON.stringify(countRes, null, 2);
+      } catch (e) {
+        setStatus('test-count', false);
+        document.getElementById('meta-count').textContent = `Помилка: ${e.message}`;
+        document.getElementById('code-count').textContent = e.stack;
+      }
+
+      // 3. countBy with dr_min
+      const t3Start = performance.now();
+      try {
+        const drRes = await countBy({ ai_source: 'lovable', dr_min: 1 });
+        const duration = Math.round(performance.now() - t3Start);
+        const pass = drRes && typeof drRes.total === 'number' && drRes.total > 0;
+        setStatus('test-dr', pass);
+        document.getElementById('meta-dr').textContent = 
+          `Тривалість: ${duration}мс | Cached: ${drRes._cached} | Total: ${drRes.total} | URL: ${drRes._sourceUrl}`;
+        document.getElementById('code-dr').textContent = JSON.stringify(drRes, null, 2);
+      } catch (e) {
+        setStatus('test-dr', false);
+        document.getElementById('meta-dr').textContent = `Помилка: ${e.message}`;
+        document.getElementById('code-dr').textContent = e.stack;
+      }
+
+      // 4. searchSites
+      const t4Start = performance.now();
+      try {
+        const searchRes = await searchSites({ ai_source: 'v0', size: 3 });
+        const duration = Math.round(performance.now() - t4Start);
+        const pass = searchRes && Array.isArray(searchRes.results) && searchRes.results.length > 0;
+        setStatus('test-search', pass);
+        document.getElementById('meta-search').textContent = 
+          `Тривалість: ${duration}мс | Cached: ${searchRes._cached} | Count: ${searchRes.results.length} | Total: ${searchRes.total}`;
+        document.getElementById('code-search').textContent = JSON.stringify({
+          ok: searchRes.ok,
+          total: searchRes.total,
+          count: searchRes.count,
+          results_sample: searchRes.results.map(r => ({
+            domain: r.domain,
+            dr: r.dr,
+            title: r.title,
+            went_live: r.went_live,
+            ai_categories: r.ai_categories
+          }))
+        }, null, 2);
+      } catch (e) {
+        setStatus('test-search', false);
+        document.getElementById('meta-search').textContent = `Помилка: ${e.message}`;
+        document.getElementById('code-search').textContent = e.stack;
+      }
+
+      // 5. Cache Verification
+      const t5Start = performance.now();
+      try {
+        const cachedStats = await getStats();
+        const duration = Math.round(performance.now() - t5Start);
+        const pass = cachedStats && cachedStats._cached === true;
+        setStatus('test-cache', pass, pass ? 'CACHE HIT' : 'CACHE MISS');
+        document.getElementById('meta-cache').textContent = 
+          `Тривалість: ${duration}мс (з пам'яті/сесії) | _cached: ${cachedStats._cached}`;
+        document.getElementById('code-cache').textContent = JSON.stringify({
+          cached: cachedStats._cached,
+          duration_ms: duration,
+          notice: 'Повторний виклик getStats() успішно завантажено з кешу без звернення до мережі!'
+        }, null, 2);
+      } catch (e) {
+        setStatus('test-cache', false);
+        document.getElementById('meta-cache').textContent = `Помилка: ${e.message}`;
+        document.getElementById('code-cache').textContent = e.stack;
+      }
+    }
+
+    document.getElementById('runTestsBtn').addEventListener('click', runAllTests);
+    runAllTests();
+  </script>
+</body>
+</html>
