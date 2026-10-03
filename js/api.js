@@ -17,18 +17,17 @@ export function getBaseUrlCandidates() {
     const origin   = window.location.origin;
 
     // 1. Same-origin relative proxy endpoints.
-    // Using relative paths (/api/, /api.php, /api) inherits the page's protocol (HTTPS)
-    // and eliminates any Mixed Content issues on https://ws-62.ws.semalt.dev or Vercel.
-    candidates.push('/api/');
+    // Using relative path '/api.php' hits the native proxy without any Nginx directory redirects,
+    // inheriting HTTPS protocol directly and avoiding any Mixed Content or CORS errors.
     candidates.push('/api.php');
     candidates.push('/api');
+    candidates.push('/api/');
 
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       // If frontend runs on a different port (e.g. IDE live server), connect to local proxy on 4000
       const port = window.location.port;
       if (port !== '4000') {
         const proto = (window.location.protocol === 'https:') ? 'https:' : 'http:';
-        candidates.push(`${proto}//localhost:4000/api/`);
         candidates.push(`${proto}//localhost:4000/api.php`);
         candidates.push(`${proto}//localhost:4000/api`);
       }
