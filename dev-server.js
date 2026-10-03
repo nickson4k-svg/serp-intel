@@ -47,7 +47,7 @@ const server = http.createServer((req, res) => {
   }
 
   // 1. Proxy API requests to FreeSerp, stripping duplicate CORS headers
-  if (pathname === '/api.php' || pathname === '/api') {
+  if (pathname === '/api.php' || pathname === '/api' || pathname === '/api/') {
     // Proxy to /api.php — confirmed working (200 JSON) via server-side probe.
     // The CORS duplicate header issue on the browser is fixed by stripping it here.
     const targetUrl = `https://freeserp.ai/api.php${parsedUrl.search}`;

@@ -16,17 +16,22 @@ export function getBaseUrlCandidates() {
     const hostname = window.location.hostname;
     const origin   = window.location.origin;
 
-    // 1. Same-origin proxy endpoints:
-    // /api works natively on Vercel via api/index.js and avoids WAF/firewall blocks on .php
-    candidates.push(`${origin}/api`);
-    candidates.push(`${origin}/api.php`);
+    // 1. Same-origin relative proxy endpoints.
+    // Using relative paths (/api/, /api.php, /api) inherits the page's protocol (HTTPS)
+    // and eliminates any Mixed Content issues on https://ws-62.ws.semalt.dev or Vercel.
+    candidates.push('/api/');
+    candidates.push('/api.php');
+    candidates.push('/api');
 
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       // If frontend runs on a different port (e.g. IDE live server), connect to local proxy on 4000
-      candidates.push('http://localhost:4000/api');
-      candidates.push('http://localhost:4000/api.php');
-      candidates.push('http://127.0.0.1:4000/api');
-      candidates.push('http://127.0.0.1:4000/api.php');
+      const port = window.location.port;
+      if (port !== '4000') {
+        const proto = (window.location.protocol === 'https:') ? 'https:' : 'http:';
+        candidates.push(`${proto}//localhost:4000/api/`);
+        candidates.push(`${proto}//localhost:4000/api.php`);
+        candidates.push(`${proto}//localhost:4000/api`);
+      }
     }
   }
 
